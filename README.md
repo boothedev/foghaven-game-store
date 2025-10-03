@@ -7,8 +7,8 @@ Built with **Flask (Python)**, **React (JavaScript)**, and **SQLite**.
 
 ## 👥 Team
 
-- **Quang Pham** - @boothedev
-- **Eric Cun** - @eric-cun
+- **[Eric Cun](https://github.com/Eric-Cun)**
+- **[Quang Pham](https://github.com/boothedev)**
 
 ---
 
