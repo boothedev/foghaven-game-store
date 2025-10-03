@@ -1,4 +1,4 @@
-# 🎮 Game Store Web
+# 🎮 Foghaven Game Store
 
 A full-stack **game store web application** where users can browse, purchase, and manage their game library.  
 Built with **Flask (Python)**, **React (JavaScript)**, and **SQLite**.
@@ -7,8 +7,8 @@ Built with **Flask (Python)**, **React (JavaScript)**, and **SQLite**.
 
 ## 👥 Team
 
-- **[Eric Cun](https://github.com/Eric-Cun)**
-- **[Quang Pham](https://github.com/boothedev)**
+- [Eric Cun](https://github.com/Eric-Cun)
+- [Quang Pham](https://github.com/boothedev)
 
 ---
 
@@ -17,7 +17,7 @@ Built with **Flask (Python)**, **React (JavaScript)**, and **SQLite**.
 - 🕹️ Browse games with detailed descriptions, screenshots, and achievements
 - 🏷️ Filter games by tags, supported platforms, and languages
 - 👤 User system with authentication, account balance, and game ownership
-- ⭐ Rate and review games
+- ⭐ Star rating system
 - 📸 Game galleries with banners and screenshots
 - 🔑 Admin controls for managing games and users
 
