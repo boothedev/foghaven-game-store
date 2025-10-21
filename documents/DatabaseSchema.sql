@@ -71,7 +71,8 @@ CREATE TABLE IF NOT EXISTS payment_cards(
     number TEXT NOT NULL,
     exp_month INTEGER NOT NULL,
     exp_year INTEGER NOT NULL,
-    security_code INTEGER NOT NULL
+    security_code INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS game_users (
