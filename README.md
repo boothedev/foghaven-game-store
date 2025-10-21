@@ -29,10 +29,10 @@ Main entities include:
 
 - **Games**: title, images, price, descriptions, developer/publisher info, release date
 - **Users**: account details, balances, admin/active status
-- **Genres, Platforms, Languages**: categorizations for games
-- **Screenshots & Achievements**: one-to-many game assets
+- **Genres, Platforms**: categorizations for games
+- **Screenshots, Movies, Achievements, Payment Cards**: one-to-many game assets
 - **GameUsers**: many-to-many relation tracking ownership, ratings, and purchases
-- **GameGenres, GamePlatforms, GameLanguages**: many-to-many relations for metadata
+- **GameGenres, GamePlatforms**: many-to-many relations for metadata
 
 ---
 
