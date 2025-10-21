@@ -15,7 +15,7 @@ Built with **Flask (Python)**, **React (JavaScript)**, and **SQLite**.
 ## 🚀 Features
 
 - 🕹️ Browse games with detailed descriptions, screenshots, and achievements
-- 🏷️ Filter games by tags, supported platforms, and languages
+- 🏷️ Filter games by genres, supported platforms, and languages
 - 👤 User system with authentication, account balance, and game ownership
 - ⭐ Star rating system
 - 📸 Game galleries with banners and screenshots
@@ -29,10 +29,10 @@ Main entities include:
 
 - **Games**: title, images, price, descriptions, developer/publisher info, release date
 - **Users**: account details, balances, admin/active status
-- **Tags, Platforms, Languages**: categorizations for games
+- **Genres, Platforms, Languages**: categorizations for games
 - **Screenshots & Achievements**: one-to-many game assets
 - **GameUsers**: many-to-many relation tracking ownership, ratings, and purchases
-- **GameTags, GamePlatforms, GameLanguages**: many-to-many relations for metadata
+- **GameGenres, GamePlatforms, GameLanguages**: many-to-many relations for metadata
 
 ---
 
