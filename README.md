@@ -15,8 +15,8 @@ Built with **Flask (Python)**, **React (JavaScript)**, and **SQLite**.
 ## 🚀 Features
 
 - 🕹️ Browse games with detailed descriptions, screenshots, and achievements
-- 🏷️ Filter games by genres, supported platforms, and languages
-- 👤 User system with authentication, account balance, and game ownership
+- 🏷️ Filter games by genres and supported platforms
+- 👤 User system with authentication, payment methods, account balance, and game ownership
 - ⭐ Star rating system
 - 📸 Game galleries with banners and screenshots
 - 🔑 Admin controls for managing games and users
