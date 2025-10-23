@@ -2,10 +2,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
     password TEXT NOT NULL,
-    balance INTEGER NOT NULL DEFAULT 0,
-    is_active BOOLEAN NOT NULL DEFAULT 1,
-    is_public BOOLEAN NOT NULL DEFAULT 1,
-    is_admin BOOLEAN NOT NULL DEFAULT 0
+    balance INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS games (
@@ -18,25 +15,24 @@ CREATE TABLE IF NOT EXISTS games (
     publisher TEXT,
     portrait TEXT,
     landscape TEXT,
-    release_date DATETIME,
+    release_date TEXT,
     stars INTEGER DEFAULT 0,
-    raters INTEGER DEFAULT 0,
-    ratings REAL DEFAULT 0.0,
-    owners INTEGER DEFAULT 0
+    rater_count INTEGER DEFAULT 0,
+    rating REAL DEFAULT 0.0
 );
 
 CREATE TABLE IF NOT EXISTS genres (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     icon TEXT,
-    weight INTEGER DEFAULT 100
+    weight INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS platforms (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    value TEXT,
-    weight INTEGER NOT NULL DEFAULT 100
+    value TEXT NOT NULL,
+    weight INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS screenshots (
