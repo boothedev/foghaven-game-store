@@ -12,10 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteRouteImport } from './routes/_main/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
-import { Route as MainStoreRouteImport } from './routes/_main/store'
 import { Route as MainProfileRouteImport } from './routes/_main/profile'
 import { Route as MainLoginRouteImport } from './routes/_main/login'
-import { Route as MainStoreGameIdRouteImport } from './routes/_main/store.$gameId'
+import { Route as MainStoreRouteRouteImport } from './routes/_main/store/route'
+import { Route as MainStoreIndexRouteImport } from './routes/_main/store/index'
+import { Route as MainStoreGameIdRouteImport } from './routes/_main/store/$gameId'
 
 const MainRouteRoute = MainRouteRouteImport.update({
   id: '/_main',
@@ -31,11 +32,6 @@ const DemoStoreRoute = DemoStoreRouteImport.update({
   path: '/demo/store',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MainStoreRoute = MainStoreRouteImport.update({
-  id: '/store',
-  path: '/store',
-  getParentRoute: () => MainRouteRoute,
-} as any)
 const MainProfileRoute = MainProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -46,58 +42,72 @@ const MainLoginRoute = MainLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => MainRouteRoute,
 } as any)
+const MainStoreRouteRoute = MainStoreRouteRouteImport.update({
+  id: '/store',
+  path: '/store',
+  getParentRoute: () => MainRouteRoute,
+} as any)
+const MainStoreIndexRoute = MainStoreIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MainStoreRouteRoute,
+} as any)
 const MainStoreGameIdRoute = MainStoreGameIdRouteImport.update({
   id: '/$gameId',
   path: '/$gameId',
-  getParentRoute: () => MainStoreRoute,
+  getParentRoute: () => MainStoreRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/store': typeof MainStoreRouteRouteWithChildren
   '/login': typeof MainLoginRoute
   '/profile': typeof MainProfileRoute
-  '/store': typeof MainStoreRouteWithChildren
   '/demo/store': typeof DemoStoreRoute
   '/store/$gameId': typeof MainStoreGameIdRoute
+  '/store/': typeof MainStoreIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof MainLoginRoute
   '/profile': typeof MainProfileRoute
-  '/store': typeof MainStoreRouteWithChildren
   '/demo/store': typeof DemoStoreRoute
   '/store/$gameId': typeof MainStoreGameIdRoute
+  '/store': typeof MainStoreIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_main': typeof MainRouteRouteWithChildren
+  '/_main/store': typeof MainStoreRouteRouteWithChildren
   '/_main/login': typeof MainLoginRoute
   '/_main/profile': typeof MainProfileRoute
-  '/_main/store': typeof MainStoreRouteWithChildren
   '/demo/store': typeof DemoStoreRoute
   '/_main/store/$gameId': typeof MainStoreGameIdRoute
+  '/_main/store/': typeof MainStoreIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/store'
     | '/login'
     | '/profile'
-    | '/store'
     | '/demo/store'
     | '/store/$gameId'
+    | '/store/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/profile' | '/store' | '/demo/store' | '/store/$gameId'
+  to: '/' | '/login' | '/profile' | '/demo/store' | '/store/$gameId' | '/store'
   id:
     | '__root__'
     | '/'
     | '/_main'
+    | '/_main/store'
     | '/_main/login'
     | '/_main/profile'
-    | '/_main/store'
     | '/demo/store'
     | '/_main/store/$gameId'
+    | '/_main/store/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -129,13 +139,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStoreRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_main/store': {
-      id: '/_main/store'
-      path: '/store'
-      fullPath: '/store'
-      preLoaderRoute: typeof MainStoreRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
     '/_main/profile': {
       id: '/_main/profile'
       path: '/profile'
@@ -150,38 +153,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainLoginRouteImport
       parentRoute: typeof MainRouteRoute
     }
+    '/_main/store': {
+      id: '/_main/store'
+      path: '/store'
+      fullPath: '/store'
+      preLoaderRoute: typeof MainStoreRouteRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
+    '/_main/store/': {
+      id: '/_main/store/'
+      path: '/'
+      fullPath: '/store/'
+      preLoaderRoute: typeof MainStoreIndexRouteImport
+      parentRoute: typeof MainStoreRouteRoute
+    }
     '/_main/store/$gameId': {
       id: '/_main/store/$gameId'
       path: '/$gameId'
       fullPath: '/store/$gameId'
       preLoaderRoute: typeof MainStoreGameIdRouteImport
-      parentRoute: typeof MainStoreRoute
+      parentRoute: typeof MainStoreRouteRoute
     }
   }
 }
 
-interface MainStoreRouteChildren {
+interface MainStoreRouteRouteChildren {
   MainStoreGameIdRoute: typeof MainStoreGameIdRoute
+  MainStoreIndexRoute: typeof MainStoreIndexRoute
 }
 
-const MainStoreRouteChildren: MainStoreRouteChildren = {
+const MainStoreRouteRouteChildren: MainStoreRouteRouteChildren = {
   MainStoreGameIdRoute: MainStoreGameIdRoute,
+  MainStoreIndexRoute: MainStoreIndexRoute,
 }
 
-const MainStoreRouteWithChildren = MainStoreRoute._addFileChildren(
-  MainStoreRouteChildren,
+const MainStoreRouteRouteWithChildren = MainStoreRouteRoute._addFileChildren(
+  MainStoreRouteRouteChildren,
 )
 
 interface MainRouteRouteChildren {
+  MainStoreRouteRoute: typeof MainStoreRouteRouteWithChildren
   MainLoginRoute: typeof MainLoginRoute
   MainProfileRoute: typeof MainProfileRoute
-  MainStoreRoute: typeof MainStoreRouteWithChildren
 }
 
 const MainRouteRouteChildren: MainRouteRouteChildren = {
+  MainStoreRouteRoute: MainStoreRouteRouteWithChildren,
   MainLoginRoute: MainLoginRoute,
   MainProfileRoute: MainProfileRoute,
-  MainStoreRoute: MainStoreRouteWithChildren,
 }
 
 const MainRouteRouteWithChildren = MainRouteRoute._addFileChildren(
