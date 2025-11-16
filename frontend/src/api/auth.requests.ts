@@ -45,6 +45,11 @@ export async function register(params: RegisterParams) {
 
 export async function currentuser() {
   const response = await fetch("/api/currentuser");
+
+  if (!response.ok) {
+    throw await response.text();
+  }
+
   const jsonData = await response.json();
   return userSchema.parse(jsonData);
 }

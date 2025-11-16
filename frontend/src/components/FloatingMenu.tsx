@@ -1,4 +1,4 @@
-import { Link, type LinkProps, useLocation } from '@tanstack/react-router';
+import { Link, type LinkProps, useLocation } from "@tanstack/react-router";
 import {
   LucideFilter,
   type LucideIcon,
@@ -7,9 +7,9 @@ import {
   LucideSearch,
   LucideStore,
   LucideUser,
-} from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
+} from "lucide-react";
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -17,13 +17,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
-
-type User = {
-  id: number;
-  username: string;
-};
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { authQueries } from "@/api/auth.queries";
+import type { User } from "@/types";
 
 type ReactNode = React.ReactNode;
 
@@ -40,7 +38,7 @@ type ActionInfoProps = {
   Icon: LucideIcon;
 };
 
-type LinkTo = LinkProps['to'];
+type LinkTo = LinkProps["to"];
 
 type ActionLinkProps = ActionInfoProps & {
   to: LinkTo;
@@ -63,7 +61,7 @@ type ActionElementProps = {
 
 function Label({ children }: LabelProps) {
   return (
-    <div className='-left-4 -translate-x-full absolute hidden text-balance rounded-2xl bg-foreground/80 px-4 py-2 font-bold text-background drop-shadow-background/30 drop-shadow-sm group-hover:block'>
+    <div className="-left-4 -translate-x-full absolute hidden text-balance rounded-2xl bg-foreground/80 px-4 py-2 font-bold text-background drop-shadow-background/30 drop-shadow-sm group-hover:block">
       {children}
     </div>
   );
@@ -129,8 +127,8 @@ function ButtonWrapper({ children, asChild, className }: ButtonWrapperProps) {
   return (
     <Button
       className={cn(
-        'group relative cursor-pointer rounded-full ease-in hover:my-1',
-        className,
+        "group relative cursor-pointer rounded-full ease-in hover:my-1",
+        className
       )}
       asChild={asChild}
     >
@@ -139,13 +137,9 @@ function ButtonWrapper({ children, asChild, className }: ButtonWrapperProps) {
   );
 }
 
-function getCurrentUser(): User | null {
-  return null;
-}
-
 const ActionElement = ({ action, className }: ActionElementProps) => {
   switch (action) {
-    case 'profile':
+    case "profile":
       return (
         <ActionLink
           key="profile"
@@ -155,7 +149,7 @@ const ActionElement = ({ action, className }: ActionElementProps) => {
           className={className}
         />
       );
-    case 'store':
+    case "store":
       return (
         <ActionLink
           key="store"
@@ -165,7 +159,7 @@ const ActionElement = ({ action, className }: ActionElementProps) => {
           className={className}
         />
       );
-    case 'login':
+    case "login":
       return (
         <ActionLink
           key="login"
@@ -175,7 +169,7 @@ const ActionElement = ({ action, className }: ActionElementProps) => {
           className={className}
         />
       );
-    case 'logout':
+    case "logout":
       return (
         <ActionLink
           key="logout"
@@ -185,7 +179,7 @@ const ActionElement = ({ action, className }: ActionElementProps) => {
           className={className}
         />
       );
-    case 'game_filter':
+    case "game_filter":
       return (
         <ActionDialog
           key="game_filter"
@@ -195,7 +189,7 @@ const ActionElement = ({ action, className }: ActionElementProps) => {
           className={className}
         />
       );
-    case 'game_search':
+    case "game_search":
       return (
         <ActionDialog
           key="game_search"
@@ -210,30 +204,30 @@ const ActionElement = ({ action, className }: ActionElementProps) => {
 
 type AllActionProps = {
   pathname: LinkTo;
-  user: User | null;
+  user?: User;
 };
 
 type ActionName =
-  | 'profile'
-  | 'store'
-  | 'login'
-  | 'logout'
-  | 'game_filter'
-  | 'game_search';
+  | "profile"
+  | "store"
+  | "login"
+  | "logout"
+  | "game_filter"
+  | "game_search";
 
 type ActionFunction = (props: AllActionProps) => boolean;
 
 type AllActionsMap = Record<ActionName, ActionFunction>;
 
 const ACTION_MAP: AllActionsMap = {
-  profile: ({ pathname, user }) => pathname !== '/profile' && user !== null,
-  store: ({ pathname }) => pathname !== '/store',
-  login: ({ pathname, user }) => pathname !== '/login' && user === null,
-  logout: ({ user }) => user !== null,
+  profile: ({ pathname, user }) => pathname !== "/profile" && !user,
+  store: ({ pathname }) => pathname !== "/store",
+  login: ({ pathname, user }) => pathname !== "/login" && !user,
+  logout: ({ user }) => !!user,
   game_filter: ({ pathname }) =>
-    pathname === '/store' || pathname === '/profile',
+    pathname === "/store" || pathname === "/profile",
   game_search: ({ pathname }) =>
-    pathname === '/store' || pathname === '/profile',
+    pathname === "/store" || pathname === "/profile",
 };
 
 const ALL_ACTION_NAMES = Object.keys(ACTION_MAP) as ActionName[];
@@ -241,12 +235,12 @@ const ALL_ACTION_NAMES = Object.keys(ACTION_MAP) as ActionName[];
 export default function FloatingMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = useLocation({
-    select: (location) => location.pathname as LinkProps['to'],
+    select: (location) => location.pathname as LinkProps["to"],
   });
-  const user = getCurrentUser();
+  const { data: user } = useQuery(authQueries.currentUser());
   const actions = useMemo(() => {
     return ALL_ACTION_NAMES.filter((action) =>
-      ACTION_MAP[action]({ pathname, user }),
+      ACTION_MAP[action]({ pathname, user })
     );
   }, [pathname, user]);
 
@@ -254,11 +248,11 @@ export default function FloatingMenu() {
     <nav>
       <ul
         className={cn(
-          'fixed right-4 bottom-4 flex flex-col items-center justify-center gap-1 rounded-t-full rounded-b-full p-2 font-bold transition-all duration-500',
+          "fixed right-4 bottom-4 flex flex-col items-center justify-center gap-1 rounded-t-full rounded-b-full p-2 font-bold transition-all duration-500",
           {
-            'bg-sidebar-primary-foreground/80': isOpen,
-            'bg-transparent': !isOpen,
-          },
+            "bg-sidebar-primary-foreground/80": isOpen,
+            "bg-transparent": !isOpen,
+          }
         )}
         onBlur={() => setIsOpen(false)}
       >
@@ -267,24 +261,24 @@ export default function FloatingMenu() {
             <ActionElement
               action={action}
               className={cn({
-                'pointer-events-auto size-16 opacity-100': isOpen,
-                'pointer-events-none translate-y-full opacity-0': !isOpen,
+                "pointer-events-auto size-16 opacity-100": isOpen,
+                "pointer-events-none translate-y-full opacity-0": !isOpen,
               })}
             />
           </li>
         ))}
         <li>
           <Button
-            className={cn('cursor-pointer rounded-full shadow-md', {
-              'size-0': isOpen,
-              'size-16': !isOpen,
+            className={cn("cursor-pointer rounded-full shadow-md", {
+              "size-0": isOpen,
+              "size-16": !isOpen,
             })}
             onClick={() => setIsOpen((prev) => !prev)}
           >
             <LucideMenu
-              className={cn('size-6', {
-                'text-transparent': isOpen,
-                'text-current': !isOpen,
+              className={cn("size-6", {
+                "text-transparent": isOpen,
+                "text-current": !isOpen,
               })}
             />
           </Button>
