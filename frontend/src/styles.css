@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Acme&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 @import 'tailwindcss';
 
 @import 'tw-animate-css';
@@ -7,7 +8,7 @@
 body {
   @apply m-0;
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -128,10 +129,104 @@ code {
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+
+@theme {
+  --font-title: 'Acme', sans-serif;
+
+  /* Foggy animation */
+  --animate-fog-1:
+    fog-opacity-1 10s linear infinite, fog-move-left 15s linear infinite;
+  --animate-fog-2:
+    fog-opacity-2 21s linear infinite, fog-move-left 13s linear infinite;
+  --animate-fog-3:
+    fog-opacity-3 18s linear infinite, fog-move-left 14s linear infinite;
+
+  @keyframes fog-opacity-1 {
+    0% {
+      opacity: 0.1;
+    }
+
+    22% {
+      opacity: 0.5;
+    }
+
+    40% {
+      opacity: 0.28;
+    }
+
+    58% {
+      opacity: 0.4;
+    }
+
+    80% {
+      opacity: 0.16;
+    }
+
+    100% {
+      opacity: 0.1;
+    }
+  }
+
+  @keyframes fog-opacity-2 {
+    0% {
+      opacity: 0.5;
+    }
+
+    25% {
+      opacity: 0.2;
+    }
+
+    50% {
+      opacity: 0.1;
+    }
+
+    80% {
+      opacity: 0.3;
+    }
+
+    100% {
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes fog-opacity-3 {
+    0% {
+      opacity: 0.8;
+    }
+
+    27% {
+      opacity: 0.2;
+    }
+
+    52% {
+      opacity: 0.6;
+    }
+
+    68% {
+      opacity: 0.3;
+    }
+
+    100% {
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes fog-move-left {
+    0% {
+      left: 0;
+    }
+
+    100% {
+      left: -100%;
+    }
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
