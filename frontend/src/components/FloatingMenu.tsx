@@ -220,9 +220,10 @@ type ActionFunction = (props: AllActionProps) => boolean;
 type AllActionsMap = Record<ActionName, ActionFunction>;
 
 const ACTION_MAP: AllActionsMap = {
-  profile: ({ pathname, user }) => pathname !== "/profile" && !user,
+  profile: ({ pathname, user }) => pathname !== "/profile" && !!user,
   store: ({ pathname }) => pathname !== "/store",
-  login: ({ pathname, user }) => pathname !== "/login" && !user,
+  login: ({ pathname, user }) =>
+    pathname !== "/login" && pathname !== "/register" && !user,
   logout: ({ user }) => !!user,
   game_filter: ({ pathname }) =>
     pathname === "/store" || pathname === "/profile",
