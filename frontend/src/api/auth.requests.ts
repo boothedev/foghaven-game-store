@@ -17,3 +17,9 @@ export async function login(params: LoginParams) {
   const data = userSchema.parse(jsonData);
   useQueryClient().setQueryData([GetAuthKey], data);
 }
+
+export async function currentuser() {
+  const response = await fetch("/api/currentuser");
+  const jsonData = await response.json();
+  return userSchema.parse(jsonData);
+}
