@@ -1,0 +1,33 @@
+import { login } from "@/api/auth.requests";
+import { LoginForm } from "@/components/LoginForm";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import type { FormEvent } from "react";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/_main/_auth/login")({
+  component: RouteComponent,
+});
+
+const onSubmitHandler = (event: FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
+
+  const formData = new FormData(event.currentTarget);
+  const username = formData.get("username")?.toString().toLowerCase() ?? "";
+  const password = formData.get("password")?.toString() ?? "";
+  const remember = formData.get("remember") !== null;
+
+  login({ username, password, remember })
+    .then(() => {
+      const nav = useNavigate();
+      toast.success("Login successful!");
+      nav({ to: "/profile" });
+    })
+    .catch((e) => {
+      toast.error("Unable to login");
+      console.error(e);
+    });
+};
+
+function RouteComponent() {
+  return <LoginForm onSubmitHandler={onSubmitHandler} />;
+}

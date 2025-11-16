@@ -29,20 +29,13 @@ export const screenshotSchema = z.object({
 
 export const movieSchema = z.object({
   thumbnail: z.string(),
-  contentSd: z.string(),
-  contentMax: z.string(),
-});
-
-export const paginationSchema = z.object({
-  totalPages: z.int(),
-  totalItems: z.int(),
-  hasMore: z.boolean(),
-  currentPage: z.int(),
+  content_sd: z.string(),
+  content_max: z.string(),
 });
 
 export const extendedPlatformSchema = platformSchema.safeExtend({
-  minRequirements: z.string().nullable(),
-  recRequirements: z.string().nullable(),
+  min_requirements: z.string().nullable(),
+  rec_requirements: z.string().nullable(),
 });
 
 export const baseGameSchema = z.object({
@@ -51,13 +44,13 @@ export const baseGameSchema = z.object({
   price: z.int().positive().transform(centsToDollars),
   introduction: z.string(),
   landscape: z.url(),
-  releaseDate: z.coerce.date().transform(dateToFormat),
+  release_date: z.coerce.date().transform(dateToFormat),
   rating: z.number().positive().lte(5),
 });
 
 export const gameListItemSchema = baseGameSchema.extend({
-  genreIds: z.array(z.int()),
-  platformIds: z.array(z.int()),
+  genre_ids: z.array(z.int()),
+  platform_ids: z.array(z.int()),
 });
 
 export const gameListSchema = z.array(gameListItemSchema);
@@ -68,12 +61,25 @@ export const gameSchema = baseGameSchema.safeExtend({
   publisher: z.string(),
   portrait: z.string(),
   landscape: z.string(),
-  raterCount: z.int(),
+  rater_count: z.int(),
   platforms: z.array(extendedPlatformSchema),
   screenshots: z.array(screenshotSchema),
   movies: z.array(movieSchema),
   achievements: z.array(achievementSchema),
-  userStars: z.int().nullable(),
+  user_stars: z.int().nullable(),
+});
+
+const cardSchema = z.object({
+  id: z.int(),
+  number: z.string(),
+  exp_month: z.int().positive(),
+  exp_year: z.int().positive(),
+});
+
+export const userSchema = z.object({
+  username: z.string(),
+  balance: z.int().nonnegative(),
+  cards: z.array(cardSchema),
 });
 
 const searchParamIntArraySchema = z.array(z.int().positive())
@@ -81,10 +87,10 @@ const searchParamIntArraySchema = z.array(z.int().positive())
 
 export const gameFiltersSchema = z.object({
   page: z.int().positive().default(1),
-  limit: z.int().positive().default(100),
+  size: z.int().positive().lte(100).default(100),
   genres: searchParamIntArraySchema.optional(),
   platforms: searchParamIntArraySchema.optional(),
-  sort: z.enum(['rating', 'rater_count']).default('rating'),
+  sort: z.enum(['rating', 'rater_count']).default('rater_count'),
   order: z.enum(['asc', 'desc']).default('desc'),
-  owned: z.boolean().default(false),
+  owned: z.boolean().optional(),
 });

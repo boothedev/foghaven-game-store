@@ -1,6 +1,5 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import z from 'zod';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -62,21 +61,3 @@ export const dateToFormat = (date: Date) => {
 
   return `${month} ${day}, ${year}`;
 };
-
-export const camelKeyTransform = z.transform(
-  (data: Record<string, unknown> | Record<string, unknown>[]) => {
-    const fn = (data: Record<string, unknown>) =>
-      Object.fromEntries(
-        Object.entries(data).map(([key, val]) => [
-          key.replace(/([-_][a-z])/g, (match) => match[1].toUpperCase()),
-          val,
-        ]),
-      );
-
-    if (Array.isArray(data)) {
-      const rs = data.map(fn);
-      return rs;
-    }
-    return fn(data);
-  },
-);

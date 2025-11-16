@@ -13,10 +13,12 @@ import { Route as MainRouteRouteImport } from './routes/_main/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
 import { Route as MainProfileRouteImport } from './routes/_main/profile'
-import { Route as MainLoginRouteImport } from './routes/_main/login'
 import { Route as MainStoreRouteRouteImport } from './routes/_main/store/route'
+import { Route as MainAuthRouteRouteImport } from './routes/_main/_auth/route'
 import { Route as MainStoreIndexRouteImport } from './routes/_main/store/index'
 import { Route as MainStoreGameIdRouteImport } from './routes/_main/store/$gameId'
+import { Route as MainAuthRegisterRouteImport } from './routes/_main/_auth/register'
+import { Route as MainAuthLoginRouteImport } from './routes/_main/_auth/login'
 
 const MainRouteRoute = MainRouteRouteImport.update({
   id: '/_main',
@@ -37,14 +39,13 @@ const MainProfileRoute = MainProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => MainRouteRoute,
 } as any)
-const MainLoginRoute = MainLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => MainRouteRoute,
-} as any)
 const MainStoreRouteRoute = MainStoreRouteRouteImport.update({
   id: '/store',
   path: '/store',
+  getParentRoute: () => MainRouteRoute,
+} as any)
+const MainAuthRouteRoute = MainAuthRouteRouteImport.update({
+  id: '/_auth',
   getParentRoute: () => MainRouteRoute,
 } as any)
 const MainStoreIndexRoute = MainStoreIndexRouteImport.update({
@@ -57,21 +58,33 @@ const MainStoreGameIdRoute = MainStoreGameIdRouteImport.update({
   path: '/$gameId',
   getParentRoute: () => MainStoreRouteRoute,
 } as any)
+const MainAuthRegisterRoute = MainAuthRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => MainAuthRouteRoute,
+} as any)
+const MainAuthLoginRoute = MainAuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => MainAuthRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/store': typeof MainStoreRouteRouteWithChildren
-  '/login': typeof MainLoginRoute
   '/profile': typeof MainProfileRoute
   '/demo/store': typeof DemoStoreRoute
+  '/login': typeof MainAuthLoginRoute
+  '/register': typeof MainAuthRegisterRoute
   '/store/$gameId': typeof MainStoreGameIdRoute
   '/store/': typeof MainStoreIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof MainLoginRoute
   '/profile': typeof MainProfileRoute
   '/demo/store': typeof DemoStoreRoute
+  '/login': typeof MainAuthLoginRoute
+  '/register': typeof MainAuthRegisterRoute
   '/store/$gameId': typeof MainStoreGameIdRoute
   '/store': typeof MainStoreIndexRoute
 }
@@ -79,10 +92,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_main': typeof MainRouteRouteWithChildren
+  '/_main/_auth': typeof MainAuthRouteRouteWithChildren
   '/_main/store': typeof MainStoreRouteRouteWithChildren
-  '/_main/login': typeof MainLoginRoute
   '/_main/profile': typeof MainProfileRoute
   '/demo/store': typeof DemoStoreRoute
+  '/_main/_auth/login': typeof MainAuthLoginRoute
+  '/_main/_auth/register': typeof MainAuthRegisterRoute
   '/_main/store/$gameId': typeof MainStoreGameIdRoute
   '/_main/store/': typeof MainStoreIndexRoute
 }
@@ -91,21 +106,31 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/store'
-    | '/login'
     | '/profile'
     | '/demo/store'
+    | '/login'
+    | '/register'
     | '/store/$gameId'
     | '/store/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/profile' | '/demo/store' | '/store/$gameId' | '/store'
+  to:
+    | '/'
+    | '/profile'
+    | '/demo/store'
+    | '/login'
+    | '/register'
+    | '/store/$gameId'
+    | '/store'
   id:
     | '__root__'
     | '/'
     | '/_main'
+    | '/_main/_auth'
     | '/_main/store'
-    | '/_main/login'
     | '/_main/profile'
     | '/demo/store'
+    | '/_main/_auth/login'
+    | '/_main/_auth/register'
     | '/_main/store/$gameId'
     | '/_main/store/'
   fileRoutesById: FileRoutesById
@@ -146,18 +171,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainProfileRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/_main/login': {
-      id: '/_main/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof MainLoginRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
     '/_main/store': {
       id: '/_main/store'
       path: '/store'
       fullPath: '/store'
       preLoaderRoute: typeof MainStoreRouteRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
+    '/_main/_auth': {
+      id: '/_main/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof MainAuthRouteRouteImport
       parentRoute: typeof MainRouteRoute
     }
     '/_main/store/': {
@@ -174,8 +199,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainStoreGameIdRouteImport
       parentRoute: typeof MainStoreRouteRoute
     }
+    '/_main/_auth/register': {
+      id: '/_main/_auth/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof MainAuthRegisterRouteImport
+      parentRoute: typeof MainAuthRouteRoute
+    }
+    '/_main/_auth/login': {
+      id: '/_main/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof MainAuthLoginRouteImport
+      parentRoute: typeof MainAuthRouteRoute
+    }
   }
 }
+
+interface MainAuthRouteRouteChildren {
+  MainAuthLoginRoute: typeof MainAuthLoginRoute
+  MainAuthRegisterRoute: typeof MainAuthRegisterRoute
+}
+
+const MainAuthRouteRouteChildren: MainAuthRouteRouteChildren = {
+  MainAuthLoginRoute: MainAuthLoginRoute,
+  MainAuthRegisterRoute: MainAuthRegisterRoute,
+}
+
+const MainAuthRouteRouteWithChildren = MainAuthRouteRoute._addFileChildren(
+  MainAuthRouteRouteChildren,
+)
 
 interface MainStoreRouteRouteChildren {
   MainStoreGameIdRoute: typeof MainStoreGameIdRoute
@@ -192,14 +245,14 @@ const MainStoreRouteRouteWithChildren = MainStoreRouteRoute._addFileChildren(
 )
 
 interface MainRouteRouteChildren {
+  MainAuthRouteRoute: typeof MainAuthRouteRouteWithChildren
   MainStoreRouteRoute: typeof MainStoreRouteRouteWithChildren
-  MainLoginRoute: typeof MainLoginRoute
   MainProfileRoute: typeof MainProfileRoute
 }
 
 const MainRouteRouteChildren: MainRouteRouteChildren = {
+  MainAuthRouteRoute: MainAuthRouteRouteWithChildren,
   MainStoreRouteRoute: MainStoreRouteRouteWithChildren,
-  MainLoginRoute: MainLoginRoute,
   MainProfileRoute: MainProfileRoute,
 }
 
