@@ -2,6 +2,7 @@ import type z from 'zod';
 import type {
   achievementSchema,
   baseGameSchema,
+  gameFiltersSchema,
   gameListItemSchema,
   gameListSchema,
   gameSchema,
@@ -28,3 +29,4 @@ export type BaseGame = z.infer<typeof baseGameSchema>;
 export type GameListItem = z.infer<typeof gameListItemSchema>;
 export type GameList = z.infer<typeof gameListSchema>;
 export type Game = z.infer<typeof gameSchema>;
+export type GameFilters = z.infer<typeof gameFiltersSchema>;

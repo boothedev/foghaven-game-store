@@ -75,3 +75,16 @@ export const gameSchema = baseGameSchema.safeExtend({
   achievements: z.array(achievementSchema),
   userStars: z.int().nullable(),
 });
+
+const searchParamIntArraySchema = z.array(z.int().positive())
+  .or(z.int().positive().transform((arg) => [arg]))
+
+export const gameFiltersSchema = z.object({
+  page: z.int().positive().default(1),
+  limit: z.int().positive().default(100),
+  genres: searchParamIntArraySchema.optional(),
+  platforms: searchParamIntArraySchema.optional(),
+  sort: z.enum(['rating', 'rater_count']).default('rating'),
+  order: z.enum(['asc', 'desc']).default('desc'),
+  owned: z.boolean().default(false),
+});

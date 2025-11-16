@@ -3,9 +3,13 @@ import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { gameQueries } from '@/api/games.queries';
 import { GameCard } from '@/components/GameCard';
-import type { GameListItem } from '@/types';
+import type { GameFilters, GameListItem } from '@/types';
 
 const GAP = 14;
+
+type GameLibraryProps = {
+  gameFilters: GameFilters;
+}
 
 type Breakpoint = {
   min: number;
@@ -122,10 +126,10 @@ function scrollBoxStyle({ totalHeight, totalWidth }: ReturnType<typeof dimension
   }
 }
 
-export default function GameLibrary() {
+export default function GameLibrary({gameFilters}: GameLibraryProps) {
   // Data fetching
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
-    useInfiniteQuery(gameQueries.infinitePages({ limit: 100 }));
+    useInfiniteQuery(gameQueries.infinitePages(gameFilters));
   const gamesMemo = useMemo<GameListItem[]>(
     () => (data ? data.pages.flat() : []),
     [data],

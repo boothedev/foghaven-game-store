@@ -1,21 +1,11 @@
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 import {
-  DEFAULT_GET_GAMES_KEYS,
   type GetGameKey,
   type GetGameListKey,
 } from './games.keys';
 import { getGame, getGameList } from './games.requests';
 
-function _gameListQuery(key: GetGameListKey) {
-  return queryOptions({
-    queryKey: ['gameList', key],
-    queryFn: getGameList.bind(null, key),
-  });
-}
-
-function gameListInfiniteQuery(partialKey: Partial<GetGameListKey> = {}) {
-  const key: GetGameListKey = { ...DEFAULT_GET_GAMES_KEYS, ...partialKey };
-
+function gameListInfiniteQuery(key: GetGameListKey) {
   return infiniteQueryOptions({
     queryKey: ['gameList', key],
     queryFn: ({ pageParam }) => getGameList({ ...key, page: pageParam }),

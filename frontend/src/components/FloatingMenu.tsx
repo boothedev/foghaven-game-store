@@ -238,7 +238,7 @@ const ACTION_MAP: AllActionsMap = {
 
 const ALL_ACTION_NAMES = Object.keys(ACTION_MAP) as ActionName[];
 
-export function FloatingMenu() {
+export default function FloatingMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = useLocation({
     select: (location) => location.pathname as LinkProps['to'],
