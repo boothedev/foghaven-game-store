@@ -23,3 +23,12 @@ export async function currentuser() {
   const jsonData = await response.json();
   return userSchema.parse(jsonData);
 }
+
+export async function logout() {
+  const response = await fetch("/api/logout", {
+    method: "POST",
+  });
+  if (response.ok) {
+    useQueryClient().invalidateQueries({ queryKey: [GetAuthKey] });
+  }
+}
