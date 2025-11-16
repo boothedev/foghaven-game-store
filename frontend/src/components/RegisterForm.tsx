@@ -1,88 +1,77 @@
-import { DialogDescription } from '@radix-ui/react-dialog';
-import type { ComponentProps } from 'react';
-import { Button } from '@/components/ui/button';
+import type { ComponentProps, FormEvent } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from './ui/dialog';
-import { Link } from '@tanstack/react-router';
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { Link } from "@tanstack/react-router";
+import { usernameOnInvalidHandler } from "./LoginForm";
 
-type LoginFormProps = ComponentProps<'div'>;
+type RegisterFormProps = ComponentProps<"div"> & {
+  onSubmitHandler: (event: FormEvent<HTMLFormElement>) => void;
+};
 
 export function RegisterForm({
+  onSubmitHandler,
   className,
   ...props
-}: LoginFormProps) {
+}: RegisterFormProps) {
   return (
-    <Card className={cn('flex flex-col gap-6', className)} {...props}>
+    <Card className={cn("flex flex-col gap-6", className)} {...props}>
       <CardHeader>
         <CardTitle>Create an account</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          Provide information to register to a new account
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form>
+        <form onSubmit={onSubmitHandler}>
           <FieldGroup>
-            <Field>
+            <Field className="grid grid-cols-[max-content_1fr]">
               <FieldLabel htmlFor="username">Username</FieldLabel>
               <Input
-                id={'username'}
+                id={"username"}
                 type="text"
                 placeholder="Username"
                 required
+                pattern="[a-zA-Z0-9_]+"
+                minLength={3}
+                onInput={usernameOnInvalidHandler}
               />
-            </Field>
-            <Field>
-              <div className="flex items-center">
-                <FieldLabel htmlFor="password">Password</FieldLabel>
-                <Dialog>
-                  <DialogTrigger className="ml-auto inline-block cursor-pointer text-sm underline-offset-4 hover:underline">
-                    Forgot your password?
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Oops!</DialogTitle>
-                      <DialogDescription>
-                        You can't ask us to fix your problem. Your fault, your
-                        responsibility.
-                      </DialogDescription>
-                    </DialogHeader>
-                  </DialogContent>
-                </Dialog>
-              </div>
+
+              <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input
-                id={'password'}
+                id={"password"}
                 type="password"
                 placeholder="Password"
                 required
+                minLength={3}
+              />
+
+              <FieldLabel htmlFor="re-password">Re-enter Password</FieldLabel>
+              <Input
+                id={"re-password"}
+                type="password"
+                placeholder="Re-enter Password"
+                required
+                minLength={3}
               />
             </Field>
             <Field>
               <Button type="submit">Register</Button>
               <FieldDescription className="text-center">
-                Already have an account?{' '}
-                <Link to='/login'>
-                  Login
-                </Link>
+                Already have an account? <Link to="/login">Login</Link>
               </FieldDescription>
             </Field>
           </FieldGroup>

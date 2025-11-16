@@ -8,11 +8,36 @@ type LoginParams = {
   remember: boolean;
 };
 
+type RegisterParams = {
+  username: string;
+  password: string;
+};
+
 export async function login(params: LoginParams) {
   const response = await fetch("/api/login", {
     method: "POST",
     body: JSON.stringify(params),
   });
+
+  if (!response.ok) {
+    throw await response.text();
+  }
+
+  const jsonData = await response.json();
+  const data = userSchema.parse(jsonData);
+  useQueryClient().setQueryData([GetAuthKey], data);
+}
+
+export async function register(params: RegisterParams) {
+  const response = await fetch("/api/register", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+
+  if (!response.ok) {
+    throw await response.text();
+  }
+
   const jsonData = await response.json();
   const data = userSchema.parse(jsonData);
   useQueryClient().setQueryData([GetAuthKey], data);

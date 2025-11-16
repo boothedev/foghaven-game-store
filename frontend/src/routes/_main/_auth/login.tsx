@@ -19,12 +19,13 @@ const onSubmitHandler = (event: FormEvent<HTMLFormElement>) => {
   login({ username, password, remember })
     .then(() => {
       const nav = useNavigate();
-      toast.success("Login successful!");
+      toast.success("Login successfully!");
       nav({ to: "/profile" });
     })
-    .catch((e) => {
-      toast.error("Unable to login");
-      console.error(e);
+    .catch((errorMsg) => {
+      toast.error("Unable to login", {
+        description: errorMsg,
+      });
     });
 };
 
