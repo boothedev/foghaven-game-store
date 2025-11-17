@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { centsToDollars, dateToFormat } from '@/lib/utils';
+import { z } from "zod";
+import { centsToDollars, dateToFormat } from "@/lib/utils";
 
 export const genreSchema = z.object({
   id: z.int(),
@@ -18,16 +18,19 @@ export const platformSchema = z.object({
 export const platformListSchema = z.array(platformSchema);
 
 export const achievementSchema = z.object({
+  id: z.int(),
   name: z.string(),
   thumbnail: z.string(),
 });
 
 export const screenshotSchema = z.object({
+  id: z.int(),
   thumbnail: z.string(),
   content: z.string(),
 });
 
 export const movieSchema = z.object({
+  id: z.int(),
   thumbnail: z.string(),
   content_sd: z.string(),
   content_max: z.string(),
@@ -37,6 +40,8 @@ export const extendedPlatformSchema = platformSchema.safeExtend({
   min_requirements: z.string().nullable(),
   rec_requirements: z.string().nullable(),
 });
+
+export const extendedPlatformListSchema = z.array(extendedPlatformSchema);
 
 export const baseGameSchema = z.object({
   id: z.int(),
@@ -62,11 +67,12 @@ export const gameSchema = baseGameSchema.safeExtend({
   portrait: z.string(),
   landscape: z.string(),
   rater_count: z.int(),
-  platforms: z.array(extendedPlatformSchema),
+  genres: genreListSchema,
+  platforms: extendedPlatformListSchema,
   screenshots: z.array(screenshotSchema),
   movies: z.array(movieSchema),
   achievements: z.array(achievementSchema),
-  user_stars: z.int().nullable(),
+  user_stars: z.int().nullable().optional(),
 });
 
 const cardSchema = z.object({
@@ -82,15 +88,22 @@ export const userSchema = z.object({
   cards: z.array(cardSchema),
 });
 
-const searchParamIntArraySchema = z.array(z.int().positive())
-  .or(z.int().positive().transform((arg) => [arg]))
+const searchParamIntArraySchema = z.array(z.int().positive()).or(
+  z
+    .int()
+    .positive()
+    .transform((arg) => [arg])
+);
 
-export const gameFiltersSchema = z.object({
-  page: z.int().positive().default(1),
-  size: z.int().positive().lte(100).default(100),
+export const gameFilterSearchSchema = z.object({
   genres: searchParamIntArraySchema.optional(),
   platforms: searchParamIntArraySchema.optional(),
-  sort: z.enum(['rating', 'rater_count']).default('rater_count'),
-  order: z.enum(['asc', 'desc']).default('desc'),
+  sort: z.enum(["rating", "rater_count"]).default("rater_count"),
+  order: z.enum(["asc", "desc"]).default("desc"),
   owned: z.boolean().optional(),
+});
+
+export const gameFiltersSchema = gameFilterSearchSchema.safeExtend({
+  page: z.int().positive().default(1),
+  size: z.int().positive().lte(100).default(100),
 });

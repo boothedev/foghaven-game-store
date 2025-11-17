@@ -1,16 +1,19 @@
-import { queryOptions } from '@tanstack/react-query';
-import type { GetPlatformKey } from './platforms.keys';
+import { queryOptions } from "@tanstack/react-query";
+import type { GetPlatformKey } from "./platforms.keys";
+import { getPlatform, getPlatformList } from "./platforms.requests";
 
 function platformListQuery() {
   return queryOptions({
-    queryKey: ['platformList'],
+    queryKey: ["platformList"],
+    queryFn: () => getPlatformList(),
     staleTime: Infinity,
   });
 }
 
 function platformQuery(key: GetPlatformKey) {
   return queryOptions({
-    queryKey: ['platform', key],
+    queryKey: ["platform", key],
+    queryFn: () => getPlatform(key),
     staleTime: Infinity,
   });
 }

@@ -3,6 +3,7 @@ import {
   LucideFilter,
   type LucideIcon,
   LucideKeyRound,
+  LucideLogOut,
   LucideMenu,
   LucideSearch,
   LucideStore,
@@ -174,7 +175,7 @@ const ActionElement = ({ action, className }: ActionElementProps) => {
         <ActionLink
           key="logout"
           to="/store"
-          Icon={LucideStore}
+          Icon={LucideLogOut}
           label="Logout"
           className={className}
         />

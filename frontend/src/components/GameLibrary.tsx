@@ -1,15 +1,15 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { useWindowVirtualizer } from '@tanstack/react-virtual';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { gameQueries } from '@/api/games.queries';
-import { GameCard } from '@/components/GameCard';
-import type { GameFilters, GameListItem } from '@/types';
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { gameQueries } from "@/api/games.queries";
+import { GameCard } from "@/components/GameCard";
+import type { GameFilterSearch, GameListItem } from "@/types";
 
 const GAP = 14;
 
 type GameLibraryProps = {
-  gameFilters: GameFilters;
-}
+  gameFilters: GameFilterSearch;
+};
 
 type Breakpoint = {
   min: number;
@@ -60,15 +60,17 @@ const BREAKPOINTS: Breakpoint[] = [
     scaleFactor: 20,
     columnCount: 1,
   },
-].map((item) => ({
-  ...item,
-  itemWidth: item.scaleFactor * 16,
-  itemHeight: item.scaleFactor * 9,
-})).sort((bp1, bp2) => bp2.min - bp1.min);
+]
+  .map((item) => ({
+    ...item,
+    itemWidth: item.scaleFactor * 16,
+    itemHeight: item.scaleFactor * 9,
+  }))
+  .sort((bp1, bp2) => bp2.min - bp1.min);
 
 function getBreakpoint() {
   // SSR Check
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return BREAKPOINTS[BREAKPOINTS.length - 1];
   }
   const windowWidth = window.innerWidth;
@@ -82,8 +84,8 @@ function useBreakpoint() {
 
   useEffect(() => {
     const listener = () => setBreakpoint(getBreakpoint());
-    window.addEventListener('resize', listener);
-    return () => window.removeEventListener('resize', listener);
+    window.addEventListener("resize", listener);
+    return () => window.removeEventListener("resize", listener);
   }, []);
 
   return breakpoint;
@@ -108,31 +110,37 @@ function rowStyle(rowIndex: number, itemHeight: number): React.CSSProperties {
     height: `${itemHeight}px`,
     transform: `translateY(${yStart}px)`,
     gap: GAP,
-  }
+  };
 }
 
-function columnStyle(columnIndex: number, itemWidth: number): React.CSSProperties {
+function columnStyle(
+  columnIndex: number,
+  itemWidth: number
+): React.CSSProperties {
   const xStart = columnIndex * itemWidth + GAP * columnIndex;
   return {
     width: `${itemWidth}px`,
     transform: `translateX(${xStart}px)`,
-  }
+  };
 }
 
-function scrollBoxStyle({ totalHeight, totalWidth }: ReturnType<typeof dimensionsCalc>) {
+function scrollBoxStyle({
+  totalHeight,
+  totalWidth,
+}: ReturnType<typeof dimensionsCalc>) {
   return {
     height: `${totalHeight}px`,
-    width: `${totalWidth}px`
-  }
+    width: `${totalWidth}px`,
+  };
 }
 
-export default function GameLibrary({gameFilters}: GameLibraryProps) {
+export default function GameLibrary({ gameFilters }: GameLibraryProps) {
   // Data fetching
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useInfiniteQuery(gameQueries.infinitePages(gameFilters));
   const gamesMemo = useMemo<GameListItem[]>(
     () => (data ? data.pages.flat() : []),
-    [data],
+    [data]
   );
   const gamesLen = gamesMemo.length;
 
@@ -142,7 +150,7 @@ export default function GameLibrary({gameFilters}: GameLibraryProps) {
   const { columnCount, itemHeight, itemWidth } = breakpoint;
   const dimensions = useMemo(
     () => dimensionsCalc(breakpoint, GAP, gamesLen),
-    [breakpoint, gamesLen],
+    [breakpoint, gamesLen]
   );
 
   // Virtualizers
@@ -181,12 +189,8 @@ export default function GameLibrary({gameFilters}: GameLibraryProps) {
   ]);
 
   return (
-    <div ref={scrollParentRef}
-      className="mx-auto h-screen w-full py-4">
-      <div
-        className="relative mx-auto"
-        style={scrollBoxStyle(dimensions)}
-      >
+    <div ref={scrollParentRef} className="mx-auto h-screen w-full py-4">
+      <div className="relative mx-auto" style={scrollBoxStyle(dimensions)}>
         {rowItems.map((vRow) => {
           return (
             <div
@@ -194,12 +198,18 @@ export default function GameLibrary({gameFilters}: GameLibraryProps) {
               className="absolute w-full"
               style={rowStyle(vRow.index, itemHeight)}
             >
-              {[...Array(columnCount)]
-                .map((_, columnIndex) => {
-                  const index = vRow.index * columnCount + columnIndex;
-                  if (index >= gamesLen) return null;
-                  return <GameCard key={index} game={gamesMemo[index]} className="absolute" style={columnStyle(columnIndex, itemWidth)} />;
-                })}
+              {[...Array(columnCount)].map((_, columnIndex) => {
+                const index = vRow.index * columnCount + columnIndex;
+                if (index >= gamesLen) return null;
+                return (
+                  <GameCard
+                    key={index}
+                    game={gamesMemo[index]}
+                    className="absolute"
+                    style={columnStyle(columnIndex, itemWidth)}
+                  />
+                );
+              })}
             </div>
           );
         })}

@@ -1,9 +1,11 @@
-import type { Game, GameList } from "@/types";
+import type { Game, GameFilters, GameList } from "@/types";
 import { gameListSchema, gameSchema } from "@/validators";
 import { prepareSearchParams } from "@/lib/utils";
-import type { GetGameKey, GetGameListKey } from "./games.keys";
+import type { GetGameKey } from "./games.keys";
 
-export async function getGameList(key: GetGameListKey): Promise<GameList> {
+type GetGameListParams = GameFilters;
+
+export async function getGameList(key: GetGameListParams): Promise<GameList> {
   const searchParams = prepareSearchParams(key);
   const response = await fetch(`/api/games?${searchParams}`);
   const data = await response.json();

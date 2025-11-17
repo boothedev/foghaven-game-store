@@ -1,14 +1,12 @@
-import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
-import {
-  type GetGameKey,
-  type GetGameListKey,
-} from './games.keys';
-import { getGame, getGameList } from './games.requests';
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
+import { type GetGameKey, type GetGameListKey } from "./games.keys";
+import { getGame, getGameList } from "./games.requests";
 
 function gameListInfiniteQuery(key: GetGameListKey) {
   return infiniteQueryOptions({
-    queryKey: ['gameList', key],
-    queryFn: ({ pageParam }) => getGameList({ ...key, page: pageParam }),
+    queryKey: ["gameList", key],
+    queryFn: ({ pageParam }) =>
+      getGameList({ ...key, page: pageParam, size: 100 }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
       if (lastPage.length !== 0) {
@@ -25,7 +23,7 @@ function gameListInfiniteQuery(key: GetGameListKey) {
 
 function gameQuery(key: GetGameKey) {
   return queryOptions({
-    queryKey: ['game', key],
+    queryKey: ["game", key],
     queryFn: getGame.bind(null, key),
   });
 }
