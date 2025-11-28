@@ -1,6 +1,5 @@
 import { Link, type LinkProps, useLocation } from "@tanstack/react-router";
 import {
-  LucideFilter,
   type LucideIcon,
   LucideKeyRound,
   LucideLogOut,
@@ -11,18 +10,10 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { authQueries } from "@/api/auth.queries";
-import type { User } from "@/types";
+import { GameSearchFilter } from "./GameSearchFilter";
+import { useLoginCheck } from "@/hooks/use-login-check";
 
 type ReactNode = React.ReactNode;
 
@@ -97,33 +88,6 @@ function ActionDialog({ label, className, Icon, Content }: ActionDialogProps) {
   );
 }
 
-function GameSearchContent() {
-  return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Are you absolutely sure?</DialogTitle>
-        <DialogDescription>
-          This action cannot be undone. This will permanently delete your
-          account and remove your data from our servers.
-        </DialogDescription>
-      </DialogHeader>
-    </DialogContent>
-  );
-}
-function GameFilterContent() {
-  return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Are you absolutely sure?</DialogTitle>
-        <DialogDescription>
-          This action cannot be undone. This will permanently delete your
-          account and remove your data from our servers.
-        </DialogDescription>
-      </DialogHeader>
-    </DialogContent>
-  );
-}
-
 function ButtonWrapper({ children, asChild, className }: ButtonWrapperProps) {
   return (
     <Button
@@ -180,23 +144,13 @@ const ActionElement = ({ action, className }: ActionElementProps) => {
           className={className}
         />
       );
-    case "game_filter":
-      return (
-        <ActionDialog
-          key="game_filter"
-          label="Filter"
-          Icon={LucideFilter}
-          Content={GameFilterContent}
-          className={className}
-        />
-      );
     case "game_search":
       return (
         <ActionDialog
           key="game_search"
           label="Search"
           Icon={LucideSearch}
-          Content={GameSearchContent}
+          Content={GameSearchFilter}
           className={className}
         />
       );
@@ -205,29 +159,21 @@ const ActionElement = ({ action, className }: ActionElementProps) => {
 
 type AllActionProps = {
   pathname: LinkTo;
-  user?: User;
+  isLogin: boolean;
 };
 
-type ActionName =
-  | "profile"
-  | "store"
-  | "login"
-  | "logout"
-  | "game_filter"
-  | "game_search";
+type ActionName = "profile" | "store" | "login" | "logout" | "game_search";
 
 type ActionFunction = (props: AllActionProps) => boolean;
 
 type AllActionsMap = Record<ActionName, ActionFunction>;
 
 const ACTION_MAP: AllActionsMap = {
-  profile: ({ pathname, user }) => pathname !== "/profile" && !!user,
+  logout: ({ isLogin }) => !!isLogin,
+  login: ({ pathname, isLogin }) =>
+    pathname !== "/login" && pathname !== "/register" && !isLogin,
+  profile: ({ pathname, isLogin }) => pathname !== "/profile" && isLogin,
   store: ({ pathname }) => pathname !== "/store",
-  login: ({ pathname, user }) =>
-    pathname !== "/login" && pathname !== "/register" && !user,
-  logout: ({ user }) => !!user,
-  game_filter: ({ pathname }) =>
-    pathname === "/store" || pathname === "/profile",
   game_search: ({ pathname }) =>
     pathname === "/store" || pathname === "/profile",
 };
@@ -239,12 +185,14 @@ export default function FloatingMenu() {
   const pathname = useLocation({
     select: (location) => location.pathname as LinkProps["to"],
   });
-  const { data: user } = useQuery(authQueries.currentUser());
-  const actions = useMemo(() => {
-    return ALL_ACTION_NAMES.filter((action) =>
-      ACTION_MAP[action]({ pathname, user })
-    );
-  }, [pathname, user]);
+  const isLogin = useLoginCheck();
+  const actions = useMemo(
+    () =>
+      ALL_ACTION_NAMES.filter((action) =>
+        ACTION_MAP[action]({ pathname, isLogin })
+      ),
+    [pathname, isLogin]
+  );
 
   return (
     <nav>
@@ -259,7 +207,13 @@ export default function FloatingMenu() {
         onBlur={() => setIsOpen(false)}
       >
         {actions.map((action) => (
-          <li key={action} onMouseDown={(e) => e.preventDefault()}>
+          <li
+            key={action}
+            onMouseDown={(e) => {
+              e.preventDefault();
+            }}
+            onClick={() => setIsOpen(false)}
+          >
             <ActionElement
               action={action}
               className={cn({

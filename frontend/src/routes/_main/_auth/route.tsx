@@ -1,9 +1,19 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
-import backgroundUrl from '/bg-auth.png';
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import backgroundUrl from "/bg-auth.png";
+import { preloadImage } from "@/lib/utils";
+import { isLoggedIn } from "@/lib/utils";
 
-export const Route = createFileRoute('/_main/_auth')({
+export const Route = createFileRoute("/_main/_auth")({
   component: RouteComponent,
-})
+  beforeLoad: () => {
+    if (isLoggedIn()) {
+      throw redirect({ to: "/" });
+    }
+  },
+  loader: () => preloadImage(backgroundUrl),
+  preload: true,
+  shouldReload: false,
+});
 
 function RouteComponent() {
   return (
@@ -16,5 +26,6 @@ function RouteComponent() {
       <div className="z-10 w-full max-w-sm">
         <Outlet />
       </div>
-    </div>)
+    </div>
+  );
 }

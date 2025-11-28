@@ -47,7 +47,7 @@ export async function currentuser() {
   const response = await fetch("/api/currentuser");
 
   if (!response.ok) {
-    throw await response.text();
+    return null;
   }
 
   const jsonData = await response.json();

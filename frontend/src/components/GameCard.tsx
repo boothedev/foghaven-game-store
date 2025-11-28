@@ -1,12 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import type { GameListItem, Genre } from "@/types";
+import type { GameListItem } from "@/types";
 import { StarRating } from "./StarRating";
 import { Badge } from "./ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { genreQueries } from "@/api/genres.queries";
 import { platformQueries } from "@/api/platforms.queries";
+import { PreloadImage } from "./ui/preload-image";
 
 type GameCardProps = {
   game: GameListItem;
@@ -26,41 +27,6 @@ type GameCardOverlayProps = {
   releaseDate: string;
   genreIds: number[];
   platformIds: number[];
-};
-
-type PreloadImageProps = {
-  src: string;
-  alt: string;
-};
-
-const PreloadImage = ({ src, alt, ...props }: PreloadImageProps) => {
-  const [isDecoded, setIsDecoded] = useState(false);
-
-  useEffect(() => {
-    if (!src) return;
-    setIsDecoded(false);
-    const img = new Image();
-
-    img.src = src;
-    img.onload = () => {
-      setIsDecoded(true);
-    };
-    img.onerror = (err) => {
-      console.error(`Failed to load image: ${src}`, err);
-      setIsDecoded(true);
-    };
-
-    return () => {
-      img.onload = null;
-      img.onerror = null;
-    };
-  }, [src]);
-
-  if (!isDecoded) {
-    return null;
-  }
-
-  return <img src={src} loading="eager" alt={alt} {...props} />;
 };
 
 export function GameCardPrimary({ image, name, rating }: GameCardPrimaryProps) {

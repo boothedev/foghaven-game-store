@@ -3,7 +3,6 @@ import type {
   achievementSchema,
   baseGameSchema,
   gameFilterSearchSchema,
-  gameFiltersSchema,
   gameListItemSchema,
   gameListSchema,
   gameSchema,
@@ -16,6 +15,10 @@ import type {
   screenshotSchema,
   userSchema,
   extendedPlatformSchema,
+  gameFilterSchema,
+  gameSearchSchema,
+  baseGameListSchema,
+  searchGameListSchema,
 } from "@/validators";
 
 export type Genre = z.infer<typeof genreSchema>;
@@ -30,9 +33,11 @@ export type Achievement = z.infer<typeof achievementSchema>;
 export type Screenshot = z.infer<typeof screenshotSchema>;
 export type Movie = z.infer<typeof movieSchema>;
 export type BaseGame = z.infer<typeof baseGameSchema>;
+export type SearchGameList = z.infer<typeof searchGameListSchema>;
 export type GameListItem = z.infer<typeof gameListItemSchema>;
 export type GameList = z.infer<typeof gameListSchema>;
 export type Game = z.infer<typeof gameSchema>;
-export type GameFilters = z.infer<typeof gameFiltersSchema>;
+export type GameFilters = z.infer<typeof gameFilterSchema>;
 export type GameFilterSearch = z.infer<typeof gameFilterSearchSchema>;
+export type GameSearch = z.infer<typeof gameSearchSchema>;
 export type User = z.infer<typeof userSchema>;

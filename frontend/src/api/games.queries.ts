@@ -1,6 +1,7 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { type GetGameKey, type GetGameListKey } from "./games.keys";
-import { getGame, getGameList } from "./games.requests";
+import { getGame, getGameList, searchGames } from "./games.requests";
+import type { GameSearch } from "@/types";
 
 function gameListInfiniteQuery(key: GetGameListKey) {
   return infiniteQueryOptions({
@@ -28,7 +29,18 @@ function gameQuery(key: GetGameKey) {
   });
 }
 
+function gameSearchQuery(key: GameSearch) {
+  return queryOptions({
+    queryKey: ["game", key],
+    queryFn: searchGames.bind(null, key),
+    initialData: [],
+    staleTime: 0,
+    gcTime: 0,
+  });
+}
+
 export const gameQueries = {
   infinitePages: gameListInfiniteQuery,
   one: gameQuery,
+  search: gameSearchQuery,
 };

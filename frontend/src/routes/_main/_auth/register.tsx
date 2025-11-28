@@ -6,6 +6,13 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_main/_auth/register")({
   component: RouteComponent,
+  head: () => ({
+    meta: [
+      {
+        title: "Register",
+      },
+    ],
+  }),
 });
 
 const onSubmitHandler = (event: FormEvent<HTMLFormElement>) => {

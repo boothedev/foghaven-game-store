@@ -7,6 +7,9 @@ import { ProfileInfo } from "@/components/ProfileInfo";
 
 export const Route = createFileRoute("/_main/profile")({
   component: RouteComponent,
+  beforeLoad: () => {
+    document.title = "My Arcana";
+  },
 });
 
 function RouteComponent() {

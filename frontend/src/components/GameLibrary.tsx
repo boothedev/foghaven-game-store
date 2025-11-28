@@ -4,11 +4,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { gameQueries } from "@/api/games.queries";
 import { GameCard } from "@/components/GameCard";
 import type { GameFilterSearch, GameListItem } from "@/types";
+import { gameFilterSchema } from "@/validators";
+import { preloadImage } from "@/lib/utils";
 
 const GAP = 14;
 
 type GameLibraryProps = {
-  gameFilters: GameFilterSearch;
+  gameFilterSeach: GameFilterSearch;
 };
 
 type Breakpoint = {
@@ -134,8 +136,9 @@ function scrollBoxStyle({
   };
 }
 
-export default function GameLibrary({ gameFilters }: GameLibraryProps) {
+export default function GameLibrary({ gameFilterSeach }: GameLibraryProps) {
   // Data fetching
+  const gameFilters = gameFilterSchema.parse(gameFilterSeach);
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useInfiniteQuery(gameQueries.infinitePages(gameFilters));
   const gamesMemo = useMemo<GameListItem[]>(
@@ -177,7 +180,13 @@ export default function GameLibrary({ gameFilters }: GameLibraryProps) {
       hasNextPage &&
       !isFetchingNextPage
     ) {
-      fetchNextPage();
+      fetchNextPage().then(({ data }) => {
+        if (data && data.pages.length > 0) {
+          data.pages[data.pages.length - 1].forEach(({ landscape }) =>
+            preloadImage(landscape)
+          );
+        }
+      });
     }
   }, [
     hasNextPage,
