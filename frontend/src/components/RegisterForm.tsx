@@ -42,17 +42,20 @@ export function RegisterForm({
               <FieldLabel htmlFor="username">Username</FieldLabel>
               <Input
                 id={"username"}
+                name="username"
                 type="text"
                 placeholder="Username"
                 required
                 pattern="[a-zA-Z0-9_]+"
                 minLength={3}
                 onInput={usernameOnInvalidHandler}
+                autoFocus
               />
 
               <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input
                 id={"password"}
+                name="password"
                 type="password"
                 placeholder="Password"
                 required
@@ -62,6 +65,7 @@ export function RegisterForm({
               <FieldLabel htmlFor="re-password">Re-enter Password</FieldLabel>
               <Input
                 id={"re-password"}
+                name="re-password"
                 type="password"
                 placeholder="Re-enter Password"
                 required

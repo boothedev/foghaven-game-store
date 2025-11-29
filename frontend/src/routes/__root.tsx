@@ -11,6 +11,7 @@ import StoreDevtools from "../lib/demo-store-devtools";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
 import type { QueryClient } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/sonner";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -21,6 +22,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     <>
       <HeadContent />
       <Outlet />
+      <Toaster position="top-right" />
       {/* <TanStackDevtools
         config={{
           position: 'bottom-right',

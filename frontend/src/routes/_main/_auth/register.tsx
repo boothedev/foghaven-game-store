@@ -1,6 +1,10 @@
 import { register } from "@/api/auth.requests";
 import { RegisterForm } from "@/components/RegisterForm";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  type UseNavigateResult,
+} from "@tanstack/react-router";
 import type { FormEvent } from "react";
 import { toast } from "sonner";
 
@@ -15,7 +19,10 @@ export const Route = createFileRoute("/_main/_auth/register")({
   }),
 });
 
-const onSubmitHandler = (event: FormEvent<HTMLFormElement>) => {
+const onSubmitHandler = (
+  navigate: UseNavigateResult<string>,
+  event: FormEvent<HTMLFormElement>
+) => {
   event.preventDefault();
 
   const formData = new FormData(event.currentTarget);
@@ -31,7 +38,9 @@ const onSubmitHandler = (event: FormEvent<HTMLFormElement>) => {
   register({ username, password })
     .then(() => {
       toast.success("Register successfully!");
-      useNavigate()({ to: "/profile" });
+      navigate({
+        to: "/login",
+      });
     })
     .catch((errorMsg) => {
       toast.error("Unable to register.", {
@@ -41,5 +50,8 @@ const onSubmitHandler = (event: FormEvent<HTMLFormElement>) => {
 };
 
 function RouteComponent() {
-  return <RegisterForm onSubmitHandler={onSubmitHandler} />;
+  const navigate = useNavigate();
+  return (
+    <RegisterForm onSubmitHandler={onSubmitHandler.bind(null, navigate)} />
+  );
 }

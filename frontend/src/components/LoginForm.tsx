@@ -69,6 +69,7 @@ export function LoginForm({
                 pattern="[a-zA-Z0-9_]+"
                 minLength={3}
                 onInput={usernameOnInvalidHandler}
+                autoFocus
               />
             </Field>
             <Field>

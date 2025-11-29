@@ -1,4 +1,10 @@
-import { Link, type LinkProps, useLocation } from "@tanstack/react-router";
+import {
+  Link,
+  type LinkProps,
+  useLocation,
+  useNavigate,
+  type UseNavigateResult,
+} from "@tanstack/react-router";
 import {
   type LucideIcon,
   LucideKeyRound,
@@ -13,7 +19,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { GameSearchFilter } from "./GameSearchFilter";
-import { useLoginCheck } from "@/hooks/use-login-check";
+import { useLoggedIn } from "@/hooks/use-login-check";
+import { logout } from "@/api/auth.requests";
+import { toast } from "sonner";
 
 type ReactNode = React.ReactNode;
 
@@ -31,6 +39,10 @@ type ActionInfoProps = {
 };
 
 type LinkTo = LinkProps["to"];
+
+type ActionButtonProps = ActionInfoProps & {
+  onClick: () => void;
+};
 
 type ActionLinkProps = ActionInfoProps & {
   to: LinkTo;
@@ -50,6 +62,21 @@ type ActionElementProps = {
   action: ActionName;
   className?: string;
 };
+
+function logoutHandler(navigate: UseNavigateResult<string>) {
+  logout()
+    .then(() => {
+      toast.success("Logout successfully");
+      navigate({
+        to: "/",
+      });
+    })
+    .catch((errorMsg) => {
+      toast.error("Unable to logout", {
+        description: errorMsg,
+      });
+    });
+}
 
 function Label({ children }: LabelProps) {
   return (
@@ -88,14 +115,30 @@ function ActionDialog({ label, className, Icon, Content }: ActionDialogProps) {
   );
 }
 
-function ButtonWrapper({ children, asChild, className }: ButtonWrapperProps) {
+function ActionButton({ label, Icon, ...props }: ActionButtonProps) {
+  return (
+    <ButtonWrapper {...props}>
+      <Label>{label}</Label>
+      <ButtonIcon Icon={Icon} />
+    </ButtonWrapper>
+  );
+}
+
+function ButtonWrapper({
+  children,
+  asChild,
+  className,
+  ...props
+}: ButtonWrapperProps) {
   return (
     <Button
       className={cn(
         "group relative cursor-pointer rounded-full ease-in hover:my-1",
         className
       )}
+      type="button"
       asChild={asChild}
+      {...props}
     >
       {children}
     </Button>
@@ -103,6 +146,7 @@ function ButtonWrapper({ children, asChild, className }: ButtonWrapperProps) {
 }
 
 const ActionElement = ({ action, className }: ActionElementProps) => {
+  const navigate = useNavigate();
   switch (action) {
     case "profile":
       return (
@@ -136,12 +180,12 @@ const ActionElement = ({ action, className }: ActionElementProps) => {
       );
     case "logout":
       return (
-        <ActionLink
+        <ActionButton
           key="logout"
-          to="/store"
           Icon={LucideLogOut}
           label="Logout"
           className={className}
+          onClick={logoutHandler.bind(null, navigate)}
         />
       );
     case "game_search":
@@ -174,8 +218,7 @@ const ACTION_MAP: AllActionsMap = {
     pathname !== "/login" && pathname !== "/register" && !isLogin,
   profile: ({ pathname, isLogin }) => pathname !== "/profile" && isLogin,
   store: ({ pathname }) => pathname !== "/store",
-  game_search: ({ pathname }) =>
-    pathname === "/store" || pathname === "/profile",
+  game_search: ({ pathname }) => pathname === "/store",
 };
 
 const ALL_ACTION_NAMES = Object.keys(ACTION_MAP) as ActionName[];
@@ -185,7 +228,7 @@ export default function FloatingMenu() {
   const pathname = useLocation({
     select: (location) => location.pathname as LinkProps["to"],
   });
-  const isLogin = useLoginCheck();
+  const isLogin = useLoggedIn();
   const actions = useMemo(
     () =>
       ALL_ACTION_NAMES.filter((action) =>

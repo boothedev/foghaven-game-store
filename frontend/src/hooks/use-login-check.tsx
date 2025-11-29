@@ -1,17 +1,21 @@
 import { isLoggedIn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
-export function useLoginCheck() {
+export function useLoggedIn() {
   const [isLogin, setIsLogin] = useState<boolean>(isLoggedIn());
 
   useEffect(() => {
-    const listener = (event: StorageEvent) => {
-      if (event.key === "isLogin") {
-        setIsLogin(event.newValue !== null);
+    const listener = (event: CookieChangeEvent) => {
+      const sessionCookie = isLogin
+        ? event.deleted.find((cookie) => cookie.name === "session_id")
+        : event.changed.find((cookie) => cookie.name === "session_id");
+
+      if (sessionCookie) {
+        setIsLogin(!isLogin);
       }
     };
-    window.addEventListener("storage", listener);
-    return () => window.removeEventListener("storage", listener);
+    cookieStore.addEventListener("change", listener);
+    return () => cookieStore.removeEventListener("change", listener);
   }, []);
 
   return isLogin;

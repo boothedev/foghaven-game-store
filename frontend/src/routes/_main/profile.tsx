@@ -4,19 +4,32 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import headerImage from "/header-profile.webp";
 import { ProfileInfo } from "@/components/ProfileInfo";
+import { toast } from "sonner";
+import { isLoggedIn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_main/profile")({
   component: RouteComponent,
-  beforeLoad: () => {
-    document.title = "My Arcana";
+  loader: ({ context: { queryClient } }) => {
+    if (!isLoggedIn()) throw "Haven't logged in yet";
+    return queryClient.ensureQueryData(authQueries.currentUser());
   },
+  onError: (e) => {
+    toast.error(e);
+    throw redirect({
+      to: "/login",
+    });
+  },
+  head: () => ({
+    meta: [
+      {
+        title: "My Arcana",
+      },
+    ],
+  }),
 });
 
 function RouteComponent() {
-  const { data, isFetched, isError } = useQuery(authQueries.currentUser());
-  if ((isFetched && data === undefined) || isError) {
-    throw redirect({ to: "/login" });
-  }
+  const data = Route.useLoaderData();
 
   return (
     <div className="flex flex-col">

@@ -162,7 +162,7 @@ export default function GameLibrary({ gameFilterSeach }: GameLibraryProps) {
     scrollMargin: scrollParentRef.current?.offsetTop ?? 0,
     estimateSize: () => itemHeight,
     gap: GAP,
-    overscan: 3,
+    overscan: 5,
   });
   const rowItems = rowVirtualizer.getVirtualItems();
 

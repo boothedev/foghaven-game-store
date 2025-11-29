@@ -31,7 +31,7 @@ import {
 import { gameFilterSearchSchema, paramIntArraySchema } from "@/validators";
 import type { GameFilterSearch } from "@/types";
 import { Switch } from "./ui/switch";
-import { useLoginCheck } from "@/hooks/use-login-check";
+import { useLoggedIn } from "@/hooks/use-login-check";
 
 type Props = {
   setState: Dispatch<SetStateAction<"search" | "filter">>;
@@ -87,7 +87,7 @@ const orderOptions: Option[] = [
 
 function Filter({ setState }: Props) {
   const navigate = useNavigate();
-  const isLogin = useLoginCheck();
+  const isLogin = useLoggedIn();
   const { sort, order, genres, platforms, owned } = useSearch({
     from: "/_main/store/",
   });

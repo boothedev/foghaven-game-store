@@ -1,6 +1,17 @@
 import { z } from "zod";
 import { centsToDollars, dateToFormat } from "@/lib/utils";
 
+export const paramIntArraySchema = z
+  .array(z.int().positive())
+  .nonempty()
+  .or(
+    z
+      .int()
+      .positive()
+      .transform((arg) => [arg])
+  )
+  .or(z.string().transform((arg) => arg.split("_").map((arg) => Number(arg))));
+
 export const genreSchema = z.object({
   id: z.int(),
   name: z.string().nonempty(),
@@ -67,11 +78,17 @@ export const searchGameSchema = z.object({
 export const searchGameListSchema = z.array(searchGameSchema);
 
 export const gameListItemSchema = baseGameSchema.extend({
-  genre_ids: z.array(z.int()),
-  platform_ids: z.array(z.int()),
+  owned: z.coerce.boolean().default(false),
+  genre_ids: paramIntArraySchema,
+  platform_ids: paramIntArraySchema,
 });
 
 export const gameListSchema = z.array(gameListItemSchema);
+
+export const user_stars = z.object({
+  stars: z.int().nullable(),
+  owned_at: z.coerce.date(),
+});
 
 export const gameSchema = baseGameSchema
   .safeExtend({
@@ -86,7 +103,7 @@ export const gameSchema = baseGameSchema
     screenshots: z.array(screenshotSchema),
     movies: z.array(movieSchema),
     achievements: z.array(achievementSchema),
-    user_stars: z.int().nullable().optional(),
+    user_stars: user_stars.optional(),
   })
   .transform((arg) => ({
     ...arg,
@@ -105,19 +122,6 @@ export const userSchema = z.object({
   balance: z.int().nonnegative(),
   cards: z.array(cardSchema),
 });
-
-export const paramIntArraySchema = z
-  .array(z.int().positive())
-  .nonempty()
-  .or(
-    z
-      .int()
-      .positive()
-      .transform((arg) => [arg])
-  )
-  .or(z.string().transform((arg) => arg.split("_").map((arg) => Number(arg))))
-  .optional()
-  .catch((_) => undefined);
 
 export const searchParamIntArrayStringSchema = paramIntArraySchema.transform(
   (arg) => {

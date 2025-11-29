@@ -1,6 +1,10 @@
 import { login } from "@/api/auth.requests";
 import { LoginForm } from "@/components/LoginForm";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  type UseNavigateResult,
+} from "@tanstack/react-router";
 import type { FormEvent } from "react";
 import { toast } from "sonner";
 
@@ -15,7 +19,10 @@ export const Route = createFileRoute("/_main/_auth/login")({
   }),
 });
 
-const onSubmitHandler = (event: FormEvent<HTMLFormElement>) => {
+const onSubmitHandler = (
+  navigate: UseNavigateResult<string>,
+  event: FormEvent<HTMLFormElement>
+) => {
   event.preventDefault();
 
   const formData = new FormData(event.currentTarget);
@@ -25,9 +32,10 @@ const onSubmitHandler = (event: FormEvent<HTMLFormElement>) => {
 
   login({ username, password, remember })
     .then(() => {
-      const nav = useNavigate();
       toast.success("Login successfully!");
-      nav({ to: "/profile" });
+      navigate({
+        to: "/profile",
+      });
     })
     .catch((errorMsg) => {
       toast.error("Unable to login", {
@@ -37,5 +45,7 @@ const onSubmitHandler = (event: FormEvent<HTMLFormElement>) => {
 };
 
 function RouteComponent() {
-  return <LoginForm onSubmitHandler={onSubmitHandler} />;
+  const navigate = useNavigate();
+
+  return <LoginForm onSubmitHandler={onSubmitHandler.bind(null, navigate)} />;
 }

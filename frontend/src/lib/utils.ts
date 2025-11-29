@@ -61,5 +61,5 @@ export const preloadImage = (src: string) => {
 };
 
 export function isLoggedIn() {
-  return window.localStorage.getItem("isLoggedIn") !== null;
+  return document.cookie.includes("session_id=");
 }

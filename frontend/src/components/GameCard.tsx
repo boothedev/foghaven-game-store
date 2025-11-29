@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { GameListItem } from "@/types";
 import { StarRating } from "./StarRating";
@@ -24,6 +23,7 @@ type GameCardPrimaryProps = {
 type GameCardOverlayProps = {
   introduction: string;
   price: string;
+  owned: boolean;
   releaseDate: string;
   genreIds: number[];
   platformIds: number[];
@@ -44,6 +44,7 @@ export function GameCardPrimary({ image, name, rating }: GameCardPrimaryProps) {
 export function GameCardOverlay({
   introduction,
   price,
+  owned,
   releaseDate,
   genreIds,
   platformIds,
@@ -92,7 +93,9 @@ export function GameCardOverlay({
               );
             })}
         </div>
-        <div className="place-self-end font-bold">{price}</div>
+        <div className="place-self-end font-bold">
+          {owned ? "Owned" : price}
+        </div>
       </div>
     </div>
   );
@@ -109,6 +112,7 @@ export function GameCard({ game, className, style }: GameCardProps) {
     landscape,
     genre_ids: genreIds,
     platform_ids: platformIds,
+    owned,
   } = game;
   return (
     <Link
@@ -124,6 +128,7 @@ export function GameCard({ game, className, style }: GameCardProps) {
       <GameCardOverlay
         introduction={introduction}
         price={price}
+        owned={owned}
         releaseDate={releaseDate}
         genreIds={genreIds}
         platformIds={platformIds}

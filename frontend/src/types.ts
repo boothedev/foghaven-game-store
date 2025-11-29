@@ -17,7 +17,6 @@ import type {
   extendedPlatformSchema,
   gameFilterSchema,
   gameSearchSchema,
-  baseGameListSchema,
   searchGameListSchema,
 } from "@/validators";
 
