@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, session, jsonify
 from haven import db
 from sqlalchemy import text
 
@@ -6,41 +6,33 @@ orders_bp = Blueprint("orders", __name__)
 
 
 @orders_bp.post("/orders")
-def buy_game():
-    data = request.json
+def create_order():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Not logged in"}), 401
 
-    user_id = data.get("user_id")
+    data = request.json
     game_id = data.get("game_id")
     price = data.get("price")
 
-    balance = db.session.execute(
-        text("SELECT balance FROM users WHERE id = :uid"),
-        {"uid": user_id}
-    ).fetchone()
-
-    if not balance:
-        return jsonify({"error": "User not found"}), 404
-
-    if balance.balance < price:
-        return jsonify({"error": "Insufficient balance"}), 400
 
     db.session.execute(
         text("""
             UPDATE users
-            SET balance = balance - :price
+            SET balance = balance - :p
             WHERE id = :uid
         """),
-        {"price": price, "uid": user_id}
+        {"p": price, "uid": user_id}
     )
 
     db.session.execute(
         text("""
-            INSERT INTO game_users (game_id, user_id, stars, owned_at)
-            VALUES (:gid, :uid, NULL, DATETIME('now'))
+            INSERT INTO game_users (game_id, user_id, owned_at)
+            VALUES (:gid, :uid, DATETIME('now'))
         """),
         {"gid": game_id, "uid": user_id}
     )
 
     db.session.commit()
 
-    return jsonify({"message": "Game purchased!"})
+    return jsonify({"message": "Order completed"})
