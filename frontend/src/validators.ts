@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { centsToDollars, dateToFormat } from "@/lib/utils";
+import {
+  cardNumberFormat,
+  centsToDollars,
+  dateToFormat,
+  expFormat,
+} from "@/lib/utils";
 
 export const paramIntArraySchema = z
   .array(z.int().positive())
@@ -103,24 +108,39 @@ export const gameSchema = baseGameSchema
     screenshots: z.array(screenshotSchema),
     movies: z.array(movieSchema),
     achievements: z.array(achievementSchema),
-    user_stars: user_stars.optional(),
+    owned: user_stars.optional(),
+    background: z.url().optional(),
   })
   .transform((arg) => ({
     ...arg,
-    background: `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${arg.id}/page_bg_raw.jpg`,
+    background: arg.background
+      ? arg.background
+      : `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${arg.id}/page_bg_raw.jpg`,
   }));
 
-const cardSchema = z.object({
-  id: z.int(),
-  number: z.string(),
+export const cardAddSchema = z.object({
+  name: z.string(),
+  number: z.string().length(16),
   exp_month: z.int().positive(),
   exp_year: z.int().positive(),
+  security_code: z.coerce.string(),
 });
+
+export const paymentCardSchema = cardAddSchema
+  .extend({
+    id: z.int(),
+  })
+  .transform((arg) => ({
+    ...arg,
+    number: cardNumberFormat(arg["number"]),
+    exp: expFormat(arg["exp_month"], arg["exp_year"]),
+  }));
 
 export const userSchema = z.object({
   username: z.string(),
-  balance: z.int().nonnegative(),
-  cards: z.array(cardSchema),
+  balance: z.int().nonnegative().transform(centsToDollars),
+  cards: z.array(paymentCardSchema),
+  owned: z.int().default(0),
 });
 
 export const searchParamIntArrayStringSchema = paramIntArraySchema.transform(

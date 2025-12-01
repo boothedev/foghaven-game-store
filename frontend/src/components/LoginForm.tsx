@@ -24,8 +24,8 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Link } from "@tanstack/react-router";
-import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
+import { Switch } from "./ui/switch";
 
 type LoginFormProps = ComponentProps<"div"> & {
   onSubmitHandler: (event: FormEvent<HTMLFormElement>) => void;
@@ -69,6 +69,7 @@ export function LoginForm({
                 pattern="[a-zA-Z0-9_]+"
                 minLength={3}
                 onInput={usernameOnInvalidHandler}
+                autoComplete="username"
                 autoFocus
               />
             </Field>
@@ -98,11 +99,12 @@ export function LoginForm({
                 type="password"
                 name="password"
                 placeholder="Password"
+                autoComplete="current-password"
                 required
                 minLength={3}
               />
               <div className="ml-1 flex items-center gap-3">
-                <Checkbox id="remember" name="remember" />
+                <Switch id="remember" name="remember" />
                 <Label htmlFor="remember">Remember</Label>
               </div>
             </Field>

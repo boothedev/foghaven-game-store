@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 
 type StarRatingProps = {
   rating: number;
+  raterCount?: number;
   totalStars?: number;
   size?: number;
   activeColor?: string;
@@ -55,6 +56,7 @@ export const GlobalStarDefs = () => (
 
 export const StarRating = ({
   rating,
+  raterCount,
   totalStars = 5,
   size = 20,
   className,
@@ -86,7 +88,6 @@ export const StarRating = ({
     );
   }
 
-  // return <div className="flex items-center">{stars}</div>;
   return (
     <svg
       width={size * totalStars}
@@ -97,7 +98,10 @@ export const StarRating = ({
       fill="currentColor"
       strokeWidth={2.5}
     >
-      <title>Rating: {rating.toFixed(1)}</title>
+      <title>
+        Rating: {rating.toFixed(1)}{" "}
+        {raterCount && `(${raterCount.toLocaleString("en-US")} raters)`}
+      </title>
       {stars}
     </svg>
   );

@@ -1,3 +1,4 @@
+import type { PaymentCardAdd } from "@/types";
 import { userSchema } from "@/validators";
 
 type LoginParams = {
@@ -11,6 +12,17 @@ type RegisterParams = {
   password: string;
 };
 
+export type UpdateUserParams = {
+  current_password: string;
+  new_username?: string;
+  new_password?: string;
+  topup?: number;
+};
+
+type GamePurchaseParams = {
+  id: number;
+};
+
 export async function login(params: LoginParams) {
   const response = await fetch("/api/login", {
     method: "POST",
@@ -21,7 +33,8 @@ export async function login(params: LoginParams) {
   });
 
   if (!response.ok) {
-    throw (await response.json())["detail"];
+    const errorMsg = (await response.json())["detail"];
+    throw Error(errorMsg);
   }
 }
 
@@ -39,12 +52,27 @@ export async function register(params: RegisterParams) {
   }
 }
 
+export async function updateUser(params: UpdateUserParams) {
+  const response = await fetch("/api/currentuser", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
+  });
+
+  if (!response.ok) {
+    const errorMsg = (await response.json())["detail"];
+    throw Error(errorMsg);
+  }
+}
+
 export async function currentuser() {
   const response = await fetch("/api/currentuser");
   const jsonData = await response.json();
 
   if (!response.ok) {
-    throw jsonData["detail"];
+    throw Error(jsonData["detail"]);
   }
 
   return userSchema.parse(jsonData);
@@ -55,6 +83,45 @@ export async function logout() {
     method: "POST",
   });
   if (!response.ok) {
-    throw (await response.json())["detail"];
+    const errorMsg = (await response.json())["detail"];
+    throw Error(errorMsg);
+  }
+}
+
+export async function removePaymentCard(id: number) {
+  const response = await fetch(`/api/payment_cards/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    const errorMsg = (await response.json())["detail"];
+    throw Error(errorMsg);
+  }
+}
+
+export async function addPaymentCard(params: PaymentCardAdd) {
+  const response = await fetch(`/api/payment_cards`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
+  });
+  if (!response.ok) {
+    const errorMsg = (await response.json())["detail"];
+    throw Error(errorMsg);
+  }
+}
+
+export async function purchaseGame(params: GamePurchaseParams) {
+  const response = await fetch(`/api/orders`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
+  });
+  if (!response.ok) {
+    const errorMsg = (await response.json())["detail"];
+    throw Error(errorMsg);
   }
 }

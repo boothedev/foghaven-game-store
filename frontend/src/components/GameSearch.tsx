@@ -24,8 +24,12 @@ export function GameSearch() {
           <LucideSearch size={18} />
         </span>
       </div>
+      {/* {games.length === 0 && (
+        <div className="text-muted-foreground self-center">No result found</div>
+      )} */}
       {games.map(({ id, landscape, name, price, rating, release_date }) => (
         <Link
+          key={id}
           to="/store/$gameId"
           params={{ gameId: String(id) }}
           className="flex bg-card border shadow rounded-md overflow-hidden"

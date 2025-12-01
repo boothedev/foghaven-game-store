@@ -9,7 +9,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { preloadImage } from "@/lib/utils";
+import { preloadImage, ratingText } from "@/lib/utils";
 import type {
   Achievement,
   Game,
@@ -20,6 +20,21 @@ import type {
 
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
+import { LucideGamepad2, LucideShoppingCart } from "lucide-react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
+import { useGamePurchase } from "@/api/auth.mutations";
 
 type HeaderTabsProps = {
   game: Game;
@@ -55,7 +70,7 @@ function OverviewTab({ game }: OverviewTabProps) {
         dangerouslySetInnerHTML={{ __html: game.introduction }}
       ></section>
       <section className="flex gap-2 flex-col">
-        <strong>Genres:</strong>
+        {/* <strong>Genres:</strong> */}
         <div className="flex gap-2 flex-wrap">
           {game.genres.map((genre) => (
             <Badge
@@ -115,6 +130,7 @@ function RequirementsTab({
       {min_requirements && (
         <section className="flex-1">
           <div
+            className="line-clamp-11"
             dangerouslySetInnerHTML={{
               __html: min_requirements,
             }}
@@ -124,6 +140,7 @@ function RequirementsTab({
       {rec_requirements && (
         <section className="flex-1">
           <div
+            className="line-clamp-11"
             dangerouslySetInnerHTML={{
               __html: rec_requirements,
             }}
@@ -266,7 +283,7 @@ function HeaderTabManager({ game }: HeaderTabsProps) {
       name: "Movies",
       value: "movies",
       content: <MoviesTab movies={game.movies} />,
-      disabled: game.movies.length > 0,
+      disabled: game.movies.length <= 0,
       preload: () =>
         game.movies.forEach(({ thumbnail }) => preloadImage(thumbnail)),
     },
@@ -274,13 +291,13 @@ function HeaderTabManager({ game }: HeaderTabsProps) {
       name: "System Requirements",
       value: "requirements",
       content: <RequirementsTabs platforms={game.platforms} />,
-      disabled: game.platforms.length > 0,
+      disabled: game.platforms.length <= 0,
     },
     {
       name: "Achievements",
       value: "achievements",
       content: <AchievementsTab achievements={game.achievements} />,
-      disabled: game.achievements.length > 0,
+      disabled: game.achievements.length <= 0,
       preload: () =>
         game.achievements.forEach(({ thumbnail }) => preloadImage(thumbnail)),
     },
@@ -289,16 +306,18 @@ function HeaderTabManager({ game }: HeaderTabsProps) {
   return (
     <Tabs defaultValue="overview" className="gap-4 h-full">
       <TabsList className="bg-background rounded-none border-b p-0 gap-5">
-        {tabs.map((tab) => (
-          <TabsTrigger
-            key={tab.value}
-            value={tab.value}
-            onMouseEnter={tab.preload}
-            className="bg-background data-[state=active]:border-primary dark:data-[state=active]:border-primary h-full rounded-none border-0 border-b-2 border-transparent data-[state=active]:shadow-none hover:border-primary/10 cursor-pointer"
-          >
-            {tab.name}
-          </TabsTrigger>
-        ))}
+        {tabs
+          .filter((tab) => !tab.disabled)
+          .map((tab) => (
+            <TabsTrigger
+              key={tab.value}
+              value={tab.value}
+              onMouseEnter={tab.preload}
+              className="bg-background data-[state=active]:border-primary dark:data-[state=active]:border-primary h-full rounded-none border-0 border-b-2 border-transparent data-[state=active]:shadow-none hover:border-primary/10 cursor-pointer"
+            >
+              {tab.name}
+            </TabsTrigger>
+          ))}
       </TabsList>
 
       {tabs.map((tab) => (
@@ -310,33 +329,176 @@ function HeaderTabManager({ game }: HeaderTabsProps) {
   );
 }
 
+type ButtonPurchaseProps = {
+  id: number;
+  name: string;
+  price: string;
+  landscape: string;
+  className: string;
+};
+function ButtonPurchase({
+  id,
+  name,
+  landscape,
+  price,
+  className,
+  ...props
+}: ButtonPurchaseProps) {
+  const purchaseGameMutation = useGamePurchase();
+  const [open, setOpen] = useState(false);
+  const purchaseHandler = () => {
+    purchaseGameMutation.mutate(
+      { id },
+      {
+        onSettled: () => {
+          setOpen(false);
+        },
+      }
+    );
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className={className} {...props}>
+          <LucideShoppingCart className="size-5" />
+          {price}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Order Transaction</DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4">
+          <img
+            src={landscape}
+            alt={name}
+            className="rounded-md overflow-hidden"
+          />
+          <p>
+            Ready to add the{" "}
+            <strong className="text-lg underline decoration-emerald-200 decoration-2">
+              {name}
+            </strong>{" "}
+            to your inventory? Your account will be charged{" "}
+            <strong className="text-lg underline decoration-emerald-200 decoration-2">
+              {price}
+            </strong>{" "}
+            upon confirmation.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Click <strong>Process</strong> to complete this transaction.
+          </p>
+        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button" variant="secondary">
+              Close
+            </Button>
+          </DialogClose>
+          <Button type="button" className="font-bold" onClick={purchaseHandler}>
+            Process ( – {price} )
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+type ButtonLaunchGameProps = {
+  gameId: number;
+  className: string;
+};
+function ButtonLaunchGame({
+  gameId,
+  className,
+  ...props
+}: ButtonLaunchGameProps) {
+  return (
+    <Button className={className} {...props} asChild>
+      <a href={`steam://launch/${gameId}`}>
+        <LucideGamepad2 className="size-5" />
+        Play Now
+      </a>
+    </Button>
+  );
+}
+
 export function GamePage({ game }: GamePageProps) {
+  const {
+    id,
+    name,
+    portrait,
+    landscape,
+    price,
+    owned,
+    background,
+    description,
+    rater_count,
+    rating,
+  } = game;
+
   return (
     <div className="size-full">
       <div className="inset-0 w-screen h-screen -z-1 fixed bg-[url('/header-game-list.webp')] brightness-150">
         <img
-          src={game.background}
-          alt={`${game.name} background`}
+          src={background}
+          alt={`${name} background`}
           className="size-full"
           onError={(e) => e.currentTarget.remove()}
         />
       </div>
       <div className="w-3xl mx-auto xl:w-5xl">
         <header className="flex drop-shadow-sm drop-shadow-card/50 rounded-xl overflow-hidden my-10 size-full aspect-7/3 backdrop-blur-lg bg-card">
-          <img
-            src={game.portrait}
-            alt={game.name}
-            className="object-cover aspect-2/3"
-          />
-          <div className="p-8 text-lg flex flex-col h-full aspect-5/3 gap-1.5">
-            <section className="flex gap-4 items-center">
-              <h1 className="text-3xl font-black">{game.name}</h1>
-              <div className="flex gap-1 shrink-0">
-                <StarRating rating={game.rating} />
-                <p className="text-muted-foreground text-sm">
-                  ({game.rater_count.toLocaleString("en-US")} raters)
-                </p>
+          <div className="relative aspect-2/3 group">
+            <img src={portrait} alt={name} className="object-cover size-full" />
+            <div className="group transition-all hover:bg-foreground/80 absolute inset-0 text-white text-lg w-full">
+              <div className="absolute bottom-0 py-2 bg-foreground/70 w-full group-hover:bg-transparent">
+                <div className="transition-all translate-x-4 group-hover:translate-x-0 flex group-hover:flex-col gap-2 items-center justify-center group-hover:scale-140 group-hover:-translate-y-1/2">
+                  <div className="hidden group-hover:block text-xs tracking-wide">
+                    {rater_count.toLocaleString("en-US")} raters -{" "}
+                    {rating.toFixed(1)}⭐
+                  </div>{" "}
+                  <StarRating
+                    size={20}
+                    rating={rating}
+                    raterCount={rater_count}
+                  />
+                  <div className="hidden group-hover:block">
+                    {ratingText(rating)}
+                  </div>
+                  {owned && (
+                    <Button
+                      className="cursor-pointer font-bold text-accent-foreground bg-card/80 group-hover:bg-card group-hover:text-accent-foreground hover:bg-amber-200"
+                      size="sm"
+                      onClick={() => alert("ok")}
+                    >
+                      Rate
+                    </Button>
+                  )}
+                </div>
               </div>
+            </div>
+          </div>
+          <div className="p-8 text-lg flex flex-col h-full aspect-5/3 gap-1.5">
+            <section className="flex gap-2 items-center justify-between">
+              <div className="flex gap-2 items-center w-full">
+                <h1 className="text-3xl font-black">{name}</h1>
+              </div>
+              {owned ? (
+                <ButtonLaunchGame
+                  gameId={id}
+                  className="font-semibold text-lg cursor-pointer min-w-35 shrink-0"
+                />
+              ) : (
+                <ButtonPurchase
+                  className="font-semibold text-lg cursor-pointer min-w-35 shrink-0"
+                  id={id}
+                  name={name}
+                  price={price}
+                  landscape={landscape}
+                />
+              )}
             </section>
             <HeaderTabManager game={game} />
           </div>
@@ -347,7 +509,7 @@ export function GamePage({ game }: GamePageProps) {
           </h2>
           <div
             className="prose prose-sm sm:prose-base lg:prose-xl xl:prose-2xl dark:prose-invert marker:text-foreground"
-            dangerouslySetInnerHTML={{ __html: game.description }}
+            dangerouslySetInnerHTML={{ __html: description }}
           ></div>
         </div>
       </div>

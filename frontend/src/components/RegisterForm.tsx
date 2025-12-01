@@ -49,6 +49,7 @@ export function RegisterForm({
                 pattern="[a-zA-Z0-9_]+"
                 minLength={3}
                 onInput={usernameOnInvalidHandler}
+                autoComplete="username"
                 autoFocus
               />
 
@@ -58,6 +59,7 @@ export function RegisterForm({
                 name="password"
                 type="password"
                 placeholder="Password"
+                autoComplete="new-password"
                 required
                 minLength={3}
               />
@@ -68,6 +70,7 @@ export function RegisterForm({
                 name="re-password"
                 type="password"
                 placeholder="Re-enter Password"
+                autoComplete="new-password"
                 required
                 minLength={3}
               />

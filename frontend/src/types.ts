@@ -18,6 +18,8 @@ import type {
   gameFilterSchema,
   gameSearchSchema,
   searchGameListSchema,
+  cardAddSchema,
+  paymentCardSchema,
 } from "@/validators";
 
 export type Genre = z.infer<typeof genreSchema>;
@@ -40,3 +42,5 @@ export type GameFilters = z.infer<typeof gameFilterSchema>;
 export type GameFilterSearch = z.infer<typeof gameFilterSearchSchema>;
 export type GameSearch = z.infer<typeof gameSearchSchema>;
 export type User = z.infer<typeof userSchema>;
+export type PaymentCard = z.infer<typeof paymentCardSchema>;
+export type PaymentCardAdd = z.infer<typeof cardAddSchema>;

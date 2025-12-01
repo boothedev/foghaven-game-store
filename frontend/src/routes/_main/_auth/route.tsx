@@ -1,21 +1,39 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Outlet,
+  redirect,
+  useNavigate,
+} from "@tanstack/react-router";
 import backgroundUrl from "/bg-auth.png";
 import { preloadImage } from "@/lib/utils";
 import { isLoggedIn } from "@/lib/utils";
+import { useCookieUpdate } from "@/hooks/use-cookie-update";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_main/_auth")({
   component: RouteComponent,
   beforeLoad: () => {
     if (isLoggedIn()) {
-      throw redirect({ to: "/" });
+      throw redirect({ to: "/profile" });
     }
   },
   loader: () => preloadImage(backgroundUrl),
   preload: true,
-  shouldReload: false,
 });
 
 function RouteComponent() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useCookieUpdate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate({
+        to: "/profile",
+      });
+    }
+  }, [isAuthenticated]);
+
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <img

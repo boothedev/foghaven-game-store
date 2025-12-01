@@ -1,10 +1,4 @@
-import {
-  Link,
-  type LinkProps,
-  useLocation,
-  useNavigate,
-  type UseNavigateResult,
-} from "@tanstack/react-router";
+import { Link, type LinkProps, useLocation } from "@tanstack/react-router";
 import {
   type LucideIcon,
   LucideKeyRound,
@@ -14,14 +8,13 @@ import {
   LucideStore,
   LucideUser,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { GameSearchFilter } from "./GameSearchFilter";
-import { useLoggedIn } from "@/hooks/use-login-check";
-import { logout } from "@/api/auth.requests";
-import { toast } from "sonner";
+import { useCookieUpdate } from "@/hooks/use-cookie-update";
+import { useLogOut } from "@/api/auth.mutations";
 
 type ReactNode = React.ReactNode;
 
@@ -58,25 +51,16 @@ type ButtonWrapperProps = {
   asChild?: boolean | undefined;
 };
 
-type ActionElementProps = {
-  action: ActionName;
-  className?: string;
+type AllActionProps = {
+  pathname: LinkTo;
+  isAuth: boolean;
 };
 
-function logoutHandler(navigate: UseNavigateResult<string>) {
-  logout()
-    .then(() => {
-      toast.success("Logout successfully");
-      navigate({
-        to: "/",
-      });
-    })
-    .catch((errorMsg) => {
-      toast.error("Unable to logout", {
-        description: errorMsg,
-      });
-    });
-}
+type ActionName = "profile" | "store" | "login" | "logout" | "game_search";
+
+type ActionFunction = (props: AllActionProps) => boolean;
+
+type AllActionsMap = Record<ActionName, ActionFunction>;
 
 function Label({ children }: LabelProps) {
   return (
@@ -145,80 +129,88 @@ function ButtonWrapper({
   );
 }
 
-const ActionElement = ({ action, className }: ActionElementProps) => {
-  const navigate = useNavigate();
-  switch (action) {
-    case "profile":
-      return (
-        <ActionLink
-          key="profile"
-          to="/profile"
-          Icon={LucideUser}
-          label="Profile"
-          className={className}
-        />
-      );
-    case "store":
-      return (
-        <ActionLink
-          key="store"
-          to="/store"
-          Icon={LucideStore}
-          label="Store"
-          className={className}
-        />
-      );
-    case "login":
-      return (
-        <ActionLink
-          key="login"
-          to="/login"
-          Icon={LucideKeyRound}
-          label="Login/Register"
-          className={className}
-        />
-      );
-    case "logout":
-      return (
-        <ActionButton
-          key="logout"
-          Icon={LucideLogOut}
-          label="Logout"
-          className={className}
-          onClick={logoutHandler.bind(null, navigate)}
-        />
-      );
-    case "game_search":
-      return (
-        <ActionDialog
-          key="game_search"
-          label="Search"
-          Icon={LucideSearch}
-          Content={GameSearchFilter}
-          className={className}
-        />
-      );
-  }
-};
+function ProfileElement({ ...props }) {
+  return (
+    <ActionLink
+      key="profile"
+      to="/profile"
+      Icon={LucideUser}
+      label="Profile"
+      {...props}
+    />
+  );
+}
 
-type AllActionProps = {
-  pathname: LinkTo;
-  isLogin: boolean;
-};
+function StoreElement({ ...props }) {
+  return (
+    <ActionLink
+      key="store"
+      to="/store"
+      Icon={LucideStore}
+      label="Store"
+      {...props}
+    />
+  );
+}
 
-type ActionName = "profile" | "store" | "login" | "logout" | "game_search";
+function LogInElement({ ...props }) {
+  return (
+    <ActionLink
+      key="login"
+      to="/login"
+      Icon={LucideKeyRound}
+      label="Login/Register"
+      {...props}
+    />
+  );
+}
 
-type ActionFunction = (props: AllActionProps) => boolean;
+function GameSearchElement({ ...props }) {
+  return (
+    <ActionDialog
+      key="game_search"
+      label="Search"
+      Icon={LucideSearch}
+      Content={GameSearchFilter}
+      {...props}
+    />
+  );
+}
 
-type AllActionsMap = Record<ActionName, ActionFunction>;
+function LogOutElement({ ...props }) {
+  const logoutMutation = useLogOut();
+  const logoutHandler = () => {
+    logoutMutation.mutate();
+  };
+  return (
+    <ActionButton
+      key="logout"
+      Icon={LucideLogOut}
+      label="Logout"
+      onClick={logoutHandler}
+      {...props}
+    />
+  );
+}
 
 const ACTION_MAP: AllActionsMap = {
-  logout: ({ isLogin }) => !!isLogin,
-  login: ({ pathname, isLogin }) =>
-    pathname !== "/login" && pathname !== "/register" && !isLogin,
-  profile: ({ pathname, isLogin }) => pathname !== "/profile" && isLogin,
+  logout: ({ isAuth }) => isAuth,
+  login: ({ pathname, isAuth }) =>
+    pathname !== "/login" && pathname !== "/register" && !isAuth,
+  profile: ({ pathname, isAuth: isAuth }) => pathname !== "/profile" && isAuth,
   store: ({ pathname }) => pathname !== "/store",
   game_search: ({ pathname }) => pathname === "/store",
+};
+
+type Element = ({ ...props }: { [x: string]: any }) => React.JSX.Element;
+type ActionElementMap = Record<ActionName, Element>;
+
+const ACTION_ELEMENT_MAP: ActionElementMap = {
+  logout: LogOutElement,
+  login: LogInElement,
+  profile: ProfileElement,
+  store: StoreElement,
+  game_search: GameSearchElement,
 };
 
 const ALL_ACTION_NAMES = Object.keys(ACTION_MAP) as ActionName[];
@@ -228,13 +220,17 @@ export default function FloatingMenu() {
   const pathname = useLocation({
     select: (location) => location.pathname as LinkProps["to"],
   });
-  const isLogin = useLoggedIn();
+  const { isAuthenticated } = useCookieUpdate();
+
   const actions = useMemo(
     () =>
-      ALL_ACTION_NAMES.filter((action) =>
-        ACTION_MAP[action]({ pathname, isLogin })
-      ),
-    [pathname, isLogin]
+      ALL_ACTION_NAMES.filter((name) =>
+        ACTION_MAP[name]({ pathname, isAuth: isAuthenticated })
+      ).map((name) => ({
+        name,
+        ActionElement: ACTION_ELEMENT_MAP[name],
+      })),
+    [pathname, isAuthenticated]
   );
 
   return (
@@ -249,16 +245,15 @@ export default function FloatingMenu() {
         )}
         onBlur={() => setIsOpen(false)}
       >
-        {actions.map((action) => (
+        {actions.map(({ name, ActionElement }) => (
           <li
-            key={action}
+            key={name}
             onMouseDown={(e) => {
               e.preventDefault();
             }}
             onClick={() => setIsOpen(false)}
           >
             <ActionElement
-              action={action}
               className={cn({
                 "pointer-events-auto size-16 opacity-100": isOpen,
                 "pointer-events-none translate-y-full opacity-0": !isOpen,

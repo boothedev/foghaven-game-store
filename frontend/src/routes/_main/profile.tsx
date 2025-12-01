@@ -1,11 +1,11 @@
 import { authQueries } from "@/api/auth.queries";
-import Header from "@/components/Header";
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import headerImage from "/header-profile.webp";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { ProfileInfo } from "@/components/ProfileInfo";
 import { toast } from "sonner";
 import { isLoggedIn } from "@/lib/utils";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useCookieUpdate } from "@/hooks/use-cookie-update";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/_main/profile")({
   component: RouteComponent,
@@ -13,8 +13,11 @@ export const Route = createFileRoute("/_main/profile")({
     if (!isLoggedIn()) throw "Haven't logged in yet";
     return queryClient.ensureQueryData(authQueries.currentUser());
   },
-  onError: (e) => {
-    toast.error(e);
+  pendingComponent: () => {
+    return "Loading...";
+  },
+  onError: (error: Error) => {
+    toast.error("Unable to load current user", { description: error.message });
     throw redirect({
       to: "/login",
     });
@@ -29,16 +32,14 @@ export const Route = createFileRoute("/_main/profile")({
 });
 
 function RouteComponent() {
-  const data = Route.useLoaderData();
+  const { isAuthenticated } = useCookieUpdate();
+  const navigate = useNavigate();
+  const { data: user } = useSuspenseQuery(authQueries.currentUser());
 
-  return (
-    <div className="flex flex-col">
-      <Header
-        imageUrl={headerImage}
-        imageAlt="Profile header image"
-        title="My Arcana"
-      />
-      {data === undefined ? <div>loading...</div> : <ProfileInfo user={data} />}
-    </div>
-  );
+  useEffect(() => {
+    if (isAuthenticated) return;
+    navigate({ from: "/profile", to: "/login" });
+  }, [isAuthenticated]);
+
+  return <ProfileInfo user={user} />;
 }

@@ -31,7 +31,8 @@ import {
 import { gameFilterSearchSchema, paramIntArraySchema } from "@/validators";
 import type { GameFilterSearch } from "@/types";
 import { Switch } from "./ui/switch";
-import { useLoggedIn } from "@/hooks/use-login-check";
+import { useCookieUpdate } from "@/hooks/use-cookie-update";
+import { Input } from "./ui/input";
 
 type Props = {
   setState: Dispatch<SetStateAction<"search" | "filter">>;
@@ -87,12 +88,13 @@ const orderOptions: Option[] = [
 
 function Filter({ setState }: Props) {
   const navigate = useNavigate();
-  const isLogin = useLoggedIn();
+  const isLogin = useCookieUpdate();
   const { sort, order, genres, platforms, owned } = useSearch({
     from: "/_main/store/",
   });
-  const defaultGenreValues = paramIntArraySchema.parse(genres) ?? [];
-  const defaultPlatformValues = paramIntArraySchema.parse(platforms) ?? [];
+  const defaultGenreValues = paramIntArraySchema.optional().parse(genres) ?? [];
+  const defaultPlatformValues =
+    paramIntArraySchema.optional().parse(platforms) ?? [];
 
   const [ownedValue, setOwnedValue] = useState(owned);
   const [genreValues, setGenreValues] = useState(defaultGenreValues);
