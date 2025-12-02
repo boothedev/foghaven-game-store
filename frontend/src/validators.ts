@@ -47,9 +47,9 @@ export const screenshotSchema = z.object({
 
 export const movieSchema = z.object({
   id: z.int(),
-  thumbnail: z.string(),
-  content_sd: z.string(),
-  content_max: z.string(),
+  thumbnail: z.url(),
+  content_sd: z.url(),
+  content_max: z.url(),
 });
 
 export const extendedPlatformSchema = platformSchema.safeExtend({
@@ -90,12 +90,13 @@ export const gameListItemSchema = baseGameSchema.extend({
 
 export const gameListSchema = z.array(gameListItemSchema);
 
-export const user_stars = z
-  .object({
-    stars: z.int().nullable().optional(),
-    owned_at: z.coerce.date(),
-  })
-  .transform((arg) => ({ ...arg, stars: arg.stars ?? undefined }));
+export const user_stars = z.object({
+  stars: z
+    .int()
+    .nullish()
+    .transform((arg) => arg ?? undefined),
+  owned_at: z.coerce.date(),
+});
 
 export const gameSchema = baseGameSchema
   .safeExtend({
@@ -110,15 +111,14 @@ export const gameSchema = baseGameSchema
     screenshots: z.array(screenshotSchema),
     movies: z.array(movieSchema),
     achievements: z.array(achievementSchema),
-    owned: user_stars.nullable().optional(),
-    background: z.url().optional(),
+    owned: user_stars.nullish().transform((arg) => arg ?? undefined),
+    background: z.url().nullish(),
   })
   .transform((arg) => ({
     ...arg,
-    owned: arg.owned ?? undefined,
-    background: arg.background
-      ? arg.background
-      : `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${arg.id}/page_bg_raw.jpg`,
+    background:
+      arg.background ??
+      `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${arg.id}/page_bg_raw.jpg`,
   }));
 
 export const cardAddSchema = z.object({
