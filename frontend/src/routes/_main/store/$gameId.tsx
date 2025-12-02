@@ -29,7 +29,8 @@ export const Route = createFileRoute("/_main/store/$gameId")({
     ],
   }),
   pendingComponent: Skeleton,
-  onError: () => {
+  onError: (error) => {
+    console.log(error);
     toast.warning("Unable to load this game.");
     throw redirect({ to: "/store" });
   },

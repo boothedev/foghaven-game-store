@@ -9,7 +9,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { preloadImage, ratingText } from "@/lib/utils";
+import { preloadImage, ratingText, userRatingText } from "@/lib/utils";
 import type {
   Achievement,
   Game,
@@ -32,9 +32,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { useGamePurchase } from "@/api/auth.mutations";
+import { useGamePurchase, useGameRate } from "@/api/auth.mutations";
+import { useCookieUpdate } from "@/hooks/use-cookie-update";
+import { Rating, RatingButton } from "./ui/shadcn-io/rating";
 
 type HeaderTabsProps = {
   game: Game;
@@ -345,6 +345,7 @@ function ButtonPurchase({
   ...props
 }: ButtonPurchaseProps) {
   const purchaseGameMutation = useGamePurchase();
+  const { isAuthenticated } = useCookieUpdate();
   const [open, setOpen] = useState(false);
   const purchaseHandler = () => {
     purchaseGameMutation.mutate(
@@ -365,42 +366,73 @@ function ButtonPurchase({
           {price}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Order Transaction</DialogTitle>
-        </DialogHeader>
-        <div className="grid gap-4">
-          <img
-            src={landscape}
-            alt={name}
-            className="rounded-md overflow-hidden"
-          />
-          <p>
-            Ready to add the{" "}
-            <strong className="text-lg underline decoration-emerald-200 decoration-2">
-              {name}
-            </strong>{" "}
-            to your inventory? Your account will be charged{" "}
-            <strong className="text-lg underline decoration-emerald-200 decoration-2">
-              {price}
-            </strong>{" "}
-            upon confirmation.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Click <strong>Process</strong> to complete this transaction.
-          </p>
-        </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Close
+      {isAuthenticated ? (
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Order Transaction</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <img
+              src={landscape}
+              alt={name}
+              className="rounded-md overflow-hidden"
+            />
+            <p>
+              Ready to add the{" "}
+              <strong className="text-lg underline decoration-emerald-200 decoration-2">
+                {name}
+              </strong>{" "}
+              to your inventory? Your account will be charged{" "}
+              <strong className="text-lg underline decoration-emerald-200 decoration-2">
+                {price}
+              </strong>{" "}
+              upon confirmation.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Click <strong>Process</strong> to complete this transaction.
+            </p>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Close
+              </Button>
+            </DialogClose>
+            <Button
+              type="button"
+              className="font-bold"
+              onClick={purchaseHandler}
+            >
+              Process ( – {price} )
             </Button>
-          </DialogClose>
-          <Button type="button" className="font-bold" onClick={purchaseHandler}>
-            Process ( – {price} )
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+          </DialogFooter>
+        </DialogContent>
+      ) : (
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Login Required</DialogTitle>
+          </DialogHeader>
+
+          <div>You need to login to process a transaction.</div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Close
+              </Button>
+            </DialogClose>
+            <Button className="font-bold" asChild>
+              <Link
+                to="/login"
+                search={{
+                  redirect: location.pathname,
+                }}
+              >
+                Login
+              </Link>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      )}
     </Dialog>
   );
 }
@@ -421,6 +453,80 @@ function ButtonLaunchGame({
         Play Now
       </a>
     </Button>
+  );
+}
+
+type ButtonRatingGameProps = {
+  gameId: number;
+  stars?: number;
+};
+
+function ButtonRatingGame({ gameId, stars }: ButtonRatingGameProps) {
+  const [open, setOpen] = useState(false);
+  const [starValue, setStarValue] = useState(stars);
+  const gameRateMutation = useGameRate();
+  const rateHandler = () => {
+    if (stars === starValue) setOpen(false);
+
+    gameRateMutation.mutate(
+      {
+        id: gameId,
+        stars: starValue === 0 ? undefined : starValue,
+      },
+      {
+        onSuccess: () => {
+          setOpen(false);
+        },
+      }
+    );
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          className="cursor-pointer font-bold text-accent-foreground bg-card/80 group-hover:bg-card group-hover:text-accent-foreground hover:bg-amber-200"
+          size="sm"
+        >
+          Rate
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Rate this game</DialogTitle>
+          <DialogDescription>How do you feel about it?</DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col items-center gap-1">
+          <Rating value={starValue ?? 0} onValueChange={setStarValue}>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <RatingButton className="text-yellow-500" key={index} size={40} />
+            ))}
+          </Rating>
+          <span className="text-lg text-muted-foreground">
+            {userRatingText(starValue) ?? "🤔"}
+          </span>
+        </div>
+        <DialogFooter className="md:justify-between">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setStarValue(undefined)}
+          >
+            Clear
+          </Button>
+          <div className="flex gap-2">
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Close
+              </Button>
+            </DialogClose>
+            <Button type="button" className="font-bold" onClick={rateHandler}>
+              Save Changes
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -468,13 +574,7 @@ export function GamePage({ game }: GamePageProps) {
                     {ratingText(rating)}
                   </div>
                   {owned && (
-                    <Button
-                      className="cursor-pointer font-bold text-accent-foreground bg-card/80 group-hover:bg-card group-hover:text-accent-foreground hover:bg-amber-200"
-                      size="sm"
-                      onClick={() => alert("ok")}
-                    >
-                      Rate
-                    </Button>
+                    <ButtonRatingGame stars={owned.stars} gameId={game.id} />
                   )}
                 </div>
               </div>

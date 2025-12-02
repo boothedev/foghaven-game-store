@@ -4,6 +4,7 @@ import {
   login,
   logout,
   purchaseGame,
+  rateGame,
   removePaymentCard,
   updateUser,
 } from "./auth.requests";
@@ -114,6 +115,25 @@ export const useGamePurchase = () => {
     },
     onError: ({ message }) => {
       toast.warning("Unable to purchase", {
+        description: message,
+      });
+    },
+  });
+};
+
+export const useGameRate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: rateGame,
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({
+        queryKey: gameQueries.one({ id }).queryKey,
+      });
+      toast.success("Rate Updated!");
+    },
+    onError: ({ message }) => {
+      toast.warning("Unable to rate the game", {
         description: message,
       });
     },

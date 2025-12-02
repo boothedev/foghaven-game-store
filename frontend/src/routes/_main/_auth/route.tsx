@@ -10,6 +10,7 @@ import { isLoggedIn } from "@/lib/utils";
 import { useCookieUpdate } from "@/hooks/use-cookie-update";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { redirectSearchSchema } from "@/validators";
 
 export const Route = createFileRoute("/_main/_auth")({
   component: RouteComponent,
@@ -18,18 +19,21 @@ export const Route = createFileRoute("/_main/_auth")({
       throw redirect({ to: "/profile" });
     }
   },
+  validateSearch: redirectSearchSchema,
   loader: () => preloadImage(backgroundUrl),
   preload: true,
 });
 
 function RouteComponent() {
+  const search = Route.useSearch();
   const navigate = useNavigate();
   const { isAuthenticated } = useCookieUpdate();
 
   useEffect(() => {
     if (isAuthenticated) {
+      search["redirect"];
       navigate({
-        to: "/profile",
+        to: search.redirect ?? "/profile",
       });
     }
   }, [isAuthenticated]);

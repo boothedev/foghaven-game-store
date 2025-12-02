@@ -90,10 +90,12 @@ export const gameListItemSchema = baseGameSchema.extend({
 
 export const gameListSchema = z.array(gameListItemSchema);
 
-export const user_stars = z.object({
-  stars: z.int().nullable(),
-  owned_at: z.coerce.date(),
-});
+export const user_stars = z
+  .object({
+    stars: z.int().nullable().optional(),
+    owned_at: z.coerce.date(),
+  })
+  .transform((arg) => ({ ...arg, stars: arg.stars ?? undefined }));
 
 export const gameSchema = baseGameSchema
   .safeExtend({
@@ -108,11 +110,12 @@ export const gameSchema = baseGameSchema
     screenshots: z.array(screenshotSchema),
     movies: z.array(movieSchema),
     achievements: z.array(achievementSchema),
-    owned: user_stars.optional(),
+    owned: user_stars.nullable().optional(),
     background: z.url().optional(),
   })
   .transform((arg) => ({
     ...arg,
+    owned: arg.owned ?? undefined,
     background: arg.background
       ? arg.background
       : `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${arg.id}/page_bg_raw.jpg`,
@@ -182,4 +185,11 @@ export const gameFilterSchema = gameFilterBaseSchema.safeExtend({
 
 export const gameSearchSchema = z.object({
   search: z.string(),
+});
+
+export const redirectSearchSchema = z.object({
+  redirect: z
+    .string()
+    .regex(/^\/[-\w\/]*]/)
+    .optional(),
 });

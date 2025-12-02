@@ -99,3 +99,16 @@ export function ratingText(rating: number) {
   const safeTarget = target ?? RATING_TEXT_MAP[RATING_TEXT_MAP.length - 1];
   return safeTarget.description;
 }
+
+const USER_RATING_TEXT_MAP = [
+  undefined,
+  /* 1 */ "Terrible",
+  /* 2 */ "Poor",
+  /* 3 */ "Okay",
+  /* 4 */ "Great",
+  /* 5 */ "Outstanding",
+];
+
+export function userRatingText(stars?: number) {
+  return USER_RATING_TEXT_MAP[stars ?? 0];
+}

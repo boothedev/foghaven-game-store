@@ -23,6 +23,11 @@ type GamePurchaseParams = {
   id: number;
 };
 
+type GameRateParams = {
+  id: number;
+  stars?: number;
+};
+
 export async function login(params: LoginParams) {
   const response = await fetch("/api/login", {
     method: "POST",
@@ -119,6 +124,20 @@ export async function purchaseGame(params: GamePurchaseParams) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(params),
+  });
+  if (!response.ok) {
+    const errorMsg = (await response.json())["detail"];
+    throw Error(errorMsg);
+  }
+}
+
+export async function rateGame({ id, stars }: GameRateParams) {
+  const response = await fetch(`/api/games/${id}/ratings`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ stars }),
   });
   if (!response.ok) {
     const errorMsg = (await response.json())["detail"];
