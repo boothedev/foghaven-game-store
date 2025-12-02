@@ -9,7 +9,7 @@ import {
   updateUser,
 } from "./auth.requests";
 import { toast } from "sonner";
-import { gameQueries } from "./games.queries";
+import { gameQueries, gameQueryPrefix } from "./games.queries";
 import { authQueries } from "./auth.queries";
 
 export const useUpdateAccount = () => {
@@ -53,6 +53,12 @@ export const useLogOut = () => {
       toast.success("Logout successfully!");
       queryClient.invalidateQueries({
         queryKey: authQueries.currentUser().queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: [gameQueryPrefix.gameList],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [gameQueryPrefix.game],
       });
     },
     onError: ({ message }) => {

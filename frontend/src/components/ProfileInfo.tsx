@@ -506,7 +506,7 @@ function PaymentMethodAdd({ setState }: PaymentMethodAddProps) {
                     id="card-number"
                     name="card-number"
                     placeholder="1234 5678 9012 3456"
-                    onInput={(e) =>
+                    onChange={(e) =>
                       setCardNumber(
                         e.currentTarget.value
                           .replaceAll(/\D/g, "")
@@ -526,7 +526,7 @@ function PaymentMethodAdd({ setState }: PaymentMethodAddProps) {
                   <Field>
                     <FieldLabel htmlFor="exp-month">Month</FieldLabel>
 
-                    <Select name="exp-month">
+                    <Select name="exp-month" required>
                       <SelectTrigger id="exp-month">
                         <SelectValue placeholder="MM" />
                       </SelectTrigger>
@@ -548,7 +548,7 @@ function PaymentMethodAdd({ setState }: PaymentMethodAddProps) {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="exp-year">Year</FieldLabel>
-                    <Select name="exp-year">
+                    <Select name="exp-year" required>
                       <SelectTrigger id="exp-year">
                         <SelectValue placeholder="YYYY" />
                       </SelectTrigger>

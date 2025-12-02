@@ -5,7 +5,7 @@ import type { GameSearch } from "@/types";
 
 function gameListInfiniteQuery(key: GetGameListKey) {
   return infiniteQueryOptions({
-    queryKey: ["gameList", key],
+    queryKey: [gameQueryPrefix.gameList, key],
     queryFn: ({ pageParam }) =>
       getGameList({ ...key, page: pageParam, size: 100 }),
     initialPageParam: 1,
@@ -24,14 +24,14 @@ function gameListInfiniteQuery(key: GetGameListKey) {
 
 function gameQuery(key: GetGameKey) {
   return queryOptions({
-    queryKey: ["game", key],
+    queryKey: [gameQueryPrefix.game, key],
     queryFn: getGame.bind(null, key),
   });
 }
 
 function gameSearchQuery(key: GameSearch) {
   return queryOptions({
-    queryKey: ["game", key],
+    queryKey: [gameQueryPrefix.gameSearch, key],
     queryFn: searchGames.bind(null, key),
     initialData: [],
     staleTime: 0,
@@ -43,4 +43,10 @@ export const gameQueries = {
   infinitePages: gameListInfiniteQuery,
   one: gameQuery,
   search: gameSearchQuery,
+};
+
+export const gameQueryPrefix = {
+  gameList: "gameList",
+  game: "game",
+  gameSearch: "gameSearch",
 };

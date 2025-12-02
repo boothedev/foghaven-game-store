@@ -32,7 +32,6 @@ import { gameFilterSearchSchema, paramIntArraySchema } from "@/validators";
 import type { GameFilterSearch } from "@/types";
 import { Switch } from "./ui/switch";
 import { useCookieUpdate } from "@/hooks/use-cookie-update";
-import { Input } from "./ui/input";
 
 type Props = {
   setState: Dispatch<SetStateAction<"search" | "filter">>;

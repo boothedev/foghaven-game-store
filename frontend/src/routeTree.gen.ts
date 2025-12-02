@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteRouteImport } from './routes/_main/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoStoreRouteImport } from './routes/demo/store'
 import { Route as MainProfileRouteImport } from './routes/_main/profile'
 import { Route as MainStoreRouteRouteImport } from './routes/_main/store/route'
 import { Route as MainAuthRouteRouteImport } from './routes/_main/_auth/route'
@@ -27,11 +26,6 @@ const MainRouteRoute = MainRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStoreRoute = DemoStoreRouteImport.update({
-  id: '/demo/store',
-  path: '/demo/store',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MainProfileRoute = MainProfileRouteImport.update({
@@ -73,7 +67,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/store': typeof MainStoreRouteRouteWithChildren
   '/profile': typeof MainProfileRoute
-  '/demo/store': typeof DemoStoreRoute
   '/login': typeof MainAuthLoginRoute
   '/register': typeof MainAuthRegisterRoute
   '/store/$gameId': typeof MainStoreGameIdRoute
@@ -82,7 +75,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/profile': typeof MainProfileRoute
-  '/demo/store': typeof DemoStoreRoute
   '/login': typeof MainAuthLoginRoute
   '/register': typeof MainAuthRegisterRoute
   '/store/$gameId': typeof MainStoreGameIdRoute
@@ -95,7 +87,6 @@ export interface FileRoutesById {
   '/_main/_auth': typeof MainAuthRouteRouteWithChildren
   '/_main/store': typeof MainStoreRouteRouteWithChildren
   '/_main/profile': typeof MainProfileRoute
-  '/demo/store': typeof DemoStoreRoute
   '/_main/_auth/login': typeof MainAuthLoginRoute
   '/_main/_auth/register': typeof MainAuthRegisterRoute
   '/_main/store/$gameId': typeof MainStoreGameIdRoute
@@ -107,20 +98,12 @@ export interface FileRouteTypes {
     | '/'
     | '/store'
     | '/profile'
-    | '/demo/store'
     | '/login'
     | '/register'
     | '/store/$gameId'
     | '/store/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/profile'
-    | '/demo/store'
-    | '/login'
-    | '/register'
-    | '/store/$gameId'
-    | '/store'
+  to: '/' | '/profile' | '/login' | '/register' | '/store/$gameId' | '/store'
   id:
     | '__root__'
     | '/'
@@ -128,7 +111,6 @@ export interface FileRouteTypes {
     | '/_main/_auth'
     | '/_main/store'
     | '/_main/profile'
-    | '/demo/store'
     | '/_main/_auth/login'
     | '/_main/_auth/register'
     | '/_main/store/$gameId'
@@ -138,7 +120,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MainRouteRoute: typeof MainRouteRouteWithChildren
-  DemoStoreRoute: typeof DemoStoreRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -155,13 +136,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/store': {
-      id: '/demo/store'
-      path: '/demo/store'
-      fullPath: '/demo/store'
-      preLoaderRoute: typeof DemoStoreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_main/profile': {
@@ -263,7 +237,6 @@ const MainRouteRouteWithChildren = MainRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MainRouteRoute: MainRouteRouteWithChildren,
-  DemoStoreRoute: DemoStoreRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

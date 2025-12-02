@@ -1,5 +1,4 @@
 import { clsx, type ClassValue } from "clsx";
-import { toast, type ToastT } from "sonner";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {

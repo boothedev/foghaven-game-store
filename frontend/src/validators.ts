@@ -190,6 +190,6 @@ export const gameSearchSchema = z.object({
 export const redirectSearchSchema = z.object({
   redirect: z
     .string()
-    .regex(/^\/[-\w\/]*]/)
+    .regex(/^\/[-\w\/]*/)
     .optional(),
 });

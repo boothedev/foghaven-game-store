@@ -9,7 +9,6 @@ import { preloadImage } from "@/lib/utils";
 import { isLoggedIn } from "@/lib/utils";
 import { useCookieUpdate } from "@/hooks/use-cookie-update";
 import { useEffect } from "react";
-import { toast } from "sonner";
 import { redirectSearchSchema } from "@/validators";
 
 export const Route = createFileRoute("/_main/_auth")({
