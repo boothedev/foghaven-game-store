@@ -196,7 +196,7 @@ function Search({ setState }: Props) {
       <DialogHeader>
         <DialogTitle>Game Search</DialogTitle>
         <DialogDescription>
-          Know your favorite game name? Try searching fot it!
+          Know your favorite game name? Try searching for it!
         </DialogDescription>
       </DialogHeader>
       <GameSearch />

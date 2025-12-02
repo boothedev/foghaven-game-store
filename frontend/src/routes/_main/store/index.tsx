@@ -41,7 +41,7 @@ function RouteComponent() {
         imageAlt="Library header image"
         title="The Vault"
       />
-      <GameLibrary gameFilterSeach={gameFilterSearch} />
+      <GameLibrary gameFilterSearch={gameFilterSearch} />
     </div>
   );
 }

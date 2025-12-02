@@ -10,7 +10,7 @@ import { preloadImage } from "@/lib/utils";
 const GAP = 14;
 
 type GameLibraryProps = {
-  gameFilterSeach: GameFilterSearch;
+  gameFilterSearch: GameFilterSearch;
 };
 
 type Breakpoint = {
@@ -136,9 +136,9 @@ function scrollBoxStyle({
   };
 }
 
-export default function GameLibrary({ gameFilterSeach }: GameLibraryProps) {
+export default function GameLibrary({ gameFilterSearch }: GameLibraryProps) {
   // Data fetching
-  const gameFilters = gameFilterSchema.parse(gameFilterSeach);
+  const gameFilters = gameFilterSchema.parse(gameFilterSearch);
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useInfiniteQuery(gameQueries.infinitePages(gameFilters));
   const gamesMemo = useMemo<GameListItem[]>(

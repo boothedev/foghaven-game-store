@@ -82,7 +82,7 @@ export function cardNumberFormat(cardNumber: string) {
 // }
 
 const RATING_TEXT_MAP = [
-  { lowerbound: 4.75, description: "Overhwelmingly Positive" },
+  { lowerbound: 4.75, description: "Overwhelmingly Positive" },
   { lowerbound: 4.5, description: "Very Positive" },
   { lowerbound: 4.0, description: "Positive" },
   { lowerbound: 3.5, description: "Mostly Positive" },

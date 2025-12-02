@@ -287,18 +287,12 @@ const MultipleSelector = React.forwardRef<
       };
     }, [open]);
 
-    // useEffect(() => {
-    //   if (value) {
-    //     setSelected(value);
-    //   }
-    // }, [value]);
-
     useEffect(() => {
       /** If `onSearch` is provided, do not trigger options updated. */
       if (!arrayOptions || onSearch) {
         return;
       }
-      const newOption = transToGroupOption(arrayOptions || [], groupBy);
+      const newOption = transToGroupOption(arrayOptions, groupBy);
       if (JSON.stringify(newOption) !== JSON.stringify(options)) {
         setOptions(newOption);
       }
