@@ -1,0 +1,98 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+env/
+ENV/
+venv/
+.venv/
+venv.bak/
+
+# Local virtualenv from VS Code
+.venv/
+
+# pyenv
+.python-version
+
+# ENV files
+.env
+.env.*
+
+# SQLite database files
+*.sqlite3
+*.db
+
+# Testing caches
+.pytest_cache/
+
+# Coverage
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# MyPy / ruff
+.mypy_cache/
+.ruff_cache/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and runtime
+*.log
+*.pid
+*.seed
+instance/
+
+# Python bytecode and temp files
+*.pyc
+*.pyo
+*.pyd
+
+# Distribution artifacts
+__pycache__/
+*.egg
+
+# Docker related (local build files)
+docker-compose.override.yml
+docker-compose.*.local.yml
+
+# Node / frontend build (if present)
+node_modules/
+dist/
+build/
+
+# Editor swap / temp files
+*~
+*.swp
+
+# JetBrains
+.idea/
+
+# Misc.
+.dockerignore
+Dockerfile
+fly.toml
