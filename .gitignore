@@ -1,0 +1,22 @@
+# =======================================
+# OS / Editor / Misc
+# =======================================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.iml
+
+# Backups / temp
+*.bak
+*.tmp

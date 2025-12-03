@@ -10,6 +10,7 @@ from routes.payment_cards import cards_bp
 from routes.platforms import platforms_bp
 from routes.genres import genres_bp
 from routes.orders import orders_bp
+from routes.users import users_bp
 
 
 def create_app():
@@ -28,6 +29,7 @@ def create_app():
     app.register_blueprint(platforms_bp, url_prefix="/api")
     app.register_blueprint(genres_bp, url_prefix="/api")
     app.register_blueprint(orders_bp, url_prefix="/api")
+    app.register_blueprint(users_bp, url_prefix="/api") 
 
     return app
 
