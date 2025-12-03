@@ -1,15 +1,15 @@
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from starlette.responses import FileResponse
-from fastapi.middleware.cors import CORSMiddleware
 import os
 
-from .routers import games as games_router
-from .routers import auth as auth_router
-from .routers import users as users_router
-from .routers import payment_cards as payment_cards_router
-from .routers import orders as orders_router
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
 
+from .routers import auth as auth_router
+from .routers import games as games_router
+from .routers import orders as orders_router
+from .routers import payment_cards as payment_cards_router
+from .routers import users as users_router
 
 app = FastAPI()
 

@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, Cookie
 from typing import Optional
 
+from fastapi import APIRouter, Cookie, HTTPException, status
+
 from app.utils.authenticate import extract_access_token
+
 from ..db import get_dbconn
 from ..schemas import GamesPurchase
-from fastapi import status
 
 router = APIRouter(prefix="/api/orders")
 

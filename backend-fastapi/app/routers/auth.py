@@ -1,11 +1,15 @@
-from fastapi import APIRouter, Response, HTTPException, status
 from typing import Optional
+
+from fastapi import APIRouter, HTTPException, Response, status
+
 from app.utils.authenticate import (
     ACCESS_TOKEN_EXPIRE_SECOND,
     ACCESS_TOKEN_EXPIRE_SECOND_TMP,
+    COOKIE_SESSION,
     create_access_token,
 )
 from app.utils.hashing import get_password_hash, verify_password
+
 from ..db import get_dbconn
 from ..schemas import UserAuth
 
@@ -36,10 +40,10 @@ def login(body: UserAuth, response: Response):
             detail="Username or password is incorrect",
         )
 
-    user_id = result[0]
-    max_age = ACCESS_TOKEN_EXPIRE_SECOND_TMP if remember else ACCESS_TOKEN_EXPIRE_SECOND
+    (user_id, _) = result
+    max_age = ACCESS_TOKEN_EXPIRE_SECOND if remember else ACCESS_TOKEN_EXPIRE_SECOND_TMP
     token = create_access_token({"user_id": user_id}, max_age)
-    response.set_cookie("session_id", token, max_age=max_age)
+    response.set_cookie(COOKIE_SESSION, token, max_age=max_age)
 
 
 @router.post("/register")
@@ -65,4 +69,4 @@ def register(body: UserAuth):
 
 @router.post("/logout")
 def logout(response: Response):
-    response.delete_cookie("session_id")
+    response.delete_cookie(COOKIE_SESSION)

@@ -1,10 +1,12 @@
 from typing import Annotated, Optional
-from fastapi import APIRouter, Query, HTTPException, Cookie
-from app.utils.authenticate import extract_access_token
-from ..db import get_dbconn
-from ..utils.sqlresult import sqlresult_to_dict, sqlresult_to_dictlist
-from ..schemas import FilterParams, GameRate
 
+from fastapi import APIRouter, Cookie, HTTPException, Query
+
+from app.utils.authenticate import extract_access_token
+
+from ..db import get_dbconn
+from ..schemas import FilterParams, GameRate
+from ..utils.sqlresult import sqlresult_to_dict, sqlresult_to_dictlist
 
 router = APIRouter(prefix="/api/games")
 
@@ -24,7 +26,7 @@ def _search_games(conn, search: str):
     sql = f"""
     SELECT id, name, price, landscape, release_date, rating
     FROM games
-    WHERE {' AND '.join(where_clauses)}
+    WHERE {" AND ".join(where_clauses)}
     ORDER BY rater_count
     LIMIT 5
     """

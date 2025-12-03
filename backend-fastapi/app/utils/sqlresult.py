@@ -2,7 +2,7 @@ from typing import Any, List, Tuple
 
 
 def sqlresult_to_dict(result: Tuple, description: Tuple[Tuple, ...]) -> dict[str, Any]:
-    return {col[0]: result[idx] for idx, col in enumerate(description)}
+    return {label[0]: value for label, value in zip(description, result)}
 
 
 def sqlresult_to_dictlist(

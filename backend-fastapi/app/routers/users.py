@@ -1,11 +1,13 @@
-from typing import Optional
-from fastapi import APIRouter, HTTPException, Cookie
+from typing import Any, Optional
 
-from app.utils.authenticate import extract_access_token
+from fastapi import APIRouter, Cookie, HTTPException, Response, status
+
+from app.utils.authenticate import COOKIE_SESSION, extract_access_token
+from app.utils.hashing import get_password_hash, verify_password
+
 from ..db import get_dbconn
 from ..schemas import UserUpdate
-from ..utils.sqlresult import sqlresult_to_dictlist, sqlresult_to_dict
-from fastapi import status
+from ..utils.sqlresult import sqlresult_to_dict, sqlresult_to_dictlist
 
 router = APIRouter(prefix="/api")
 
@@ -16,11 +18,25 @@ def update_current_user(body: UserUpdate, session_id: Optional[str] = Cookie(Non
     if user_id is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    params = {
+    params: dict[str, Any] = {
         "user_id": user_id,
-        "current_password": body.current_password,
     }
 
+    # Verify password
+    with get_dbconn() as conn:
+        (current_password_hash,) = conn.execute(
+            """
+            SELECT password
+            WHERE id = :user_id
+            """,
+            params,
+        ).fetchone()
+        if not verify_password(body.current_password, current_password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid password"
+            )
+
+    ## Collect updates
     update_queries = []
 
     # New username
@@ -31,7 +47,7 @@ def update_current_user(body: UserUpdate, session_id: Optional[str] = Cookie(Non
     # New password
     if body.new_password is not None:
         update_queries.append("password = :new_password")
-        params.update({"new_password": body.new_password})
+        params.update({"new_password": get_password_hash(body.new_password)})
 
     # Topup balance
     if body.topup is not None:
@@ -45,13 +61,14 @@ def update_current_user(body: UserUpdate, session_id: Optional[str] = Cookie(Non
         )
     update_fragment = ",".join(update_queries)
 
+    ## Process updates
     with get_dbconn() as conn:
         try:
             cursor = conn.execute(
                 f"""
                 UPDATE users
                 SET {update_fragment}
-                WHERE id = :user_id AND password = :current_password
+                WHERE id = :user_id
                 """,
                 params,
             )
@@ -69,9 +86,10 @@ def update_current_user(body: UserUpdate, session_id: Optional[str] = Cookie(Non
 
 
 @router.get("/currentuser")
-def get_current_user(session_id: Optional[str] = Cookie(None)):
+def get_current_user(response: Response, session_id: Optional[str] = Cookie(None)):
     user_id = extract_access_token(session_id)
     if user_id is None:
+        response.delete_cookie(COOKIE_SESSION)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     with get_dbconn() as conn:
@@ -85,12 +103,7 @@ def get_current_user(session_id: Optional[str] = Cookie(None)):
             """,
             (user_id,),
         )
-
         user_rs = cursor.fetchone()
-
-        if not user_rs:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
         user = sqlresult_to_dict(user_rs, cursor.description)
 
         cursor = conn.execute(
