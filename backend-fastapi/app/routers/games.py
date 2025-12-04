@@ -91,7 +91,7 @@ def get_games(
 
     if owned and user_id is not None:
         conditions.append(
-            f"""
+            """
             id IN (
                 SELECT game_id FROM game_users
                 WHERE user_id = :user_id)
