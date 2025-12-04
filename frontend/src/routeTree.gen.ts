@@ -11,9 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteRouteImport } from './routes/_main/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
-import { Route as DemoStoreRouteImport } from './routes/demo/store'
+import { Route as MainProfileRouteImport } from './routes/_main/profile'
+import { Route as MainStoreRouteRouteImport } from './routes/_main/store/route'
+import { Route as MainAuthRouteRouteImport } from './routes/_main/_auth/route'
 import { Route as MainStoreIndexRouteImport } from './routes/_main/store/index'
+import { Route as MainStoreGameIdRouteImport } from './routes/_main/store/$gameId'
+import { Route as MainAuthRegisterRouteImport } from './routes/_main/_auth/register'
+import { Route as MainAuthLoginRouteImport } from './routes/_main/_auth/login'
 
 const MainRouteRoute = MainRouteRouteImport.update({
   id: '/_main',
@@ -24,61 +28,98 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
-  getParentRoute: () => rootRouteImport,
+const MainProfileRoute = MainProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => MainRouteRoute,
 } as any)
-const DemoStoreRoute = DemoStoreRouteImport.update({
-  id: '/demo/store',
-  path: '/demo/store',
-  getParentRoute: () => rootRouteImport,
+const MainStoreRouteRoute = MainStoreRouteRouteImport.update({
+  id: '/store',
+  path: '/store',
+  getParentRoute: () => MainRouteRoute,
+} as any)
+const MainAuthRouteRoute = MainAuthRouteRouteImport.update({
+  id: '/_auth',
+  getParentRoute: () => MainRouteRoute,
 } as any)
 const MainStoreIndexRoute = MainStoreIndexRouteImport.update({
-  id: '/store/',
-  path: '/store/',
-  getParentRoute: () => MainRouteRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => MainStoreRouteRoute,
+} as any)
+const MainStoreGameIdRoute = MainStoreGameIdRouteImport.update({
+  id: '/$gameId',
+  path: '/$gameId',
+  getParentRoute: () => MainStoreRouteRoute,
+} as any)
+const MainAuthRegisterRoute = MainAuthRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => MainAuthRouteRoute,
+} as any)
+const MainAuthLoginRoute = MainAuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => MainAuthRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/store': typeof MainStoreIndexRoute
+  '/store': typeof MainStoreRouteRouteWithChildren
+  '/profile': typeof MainProfileRoute
+  '/login': typeof MainAuthLoginRoute
+  '/register': typeof MainAuthRegisterRoute
+  '/store/$gameId': typeof MainStoreGameIdRoute
+  '/store/': typeof MainStoreIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/profile': typeof MainProfileRoute
+  '/login': typeof MainAuthLoginRoute
+  '/register': typeof MainAuthRegisterRoute
+  '/store/$gameId': typeof MainStoreGameIdRoute
   '/store': typeof MainStoreIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_main': typeof MainRouteRouteWithChildren
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/_main/_auth': typeof MainAuthRouteRouteWithChildren
+  '/_main/store': typeof MainStoreRouteRouteWithChildren
+  '/_main/profile': typeof MainProfileRoute
+  '/_main/_auth/login': typeof MainAuthLoginRoute
+  '/_main/_auth/register': typeof MainAuthRegisterRoute
+  '/_main/store/$gameId': typeof MainStoreGameIdRoute
   '/_main/store/': typeof MainStoreIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/demo/store' | '/demo/tanstack-query' | '/store'
+  fullPaths:
+    | '/'
+    | '/store'
+    | '/profile'
+    | '/login'
+    | '/register'
+    | '/store/$gameId'
+    | '/store/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/demo/store' | '/demo/tanstack-query' | '/store'
+  to: '/' | '/profile' | '/login' | '/register' | '/store/$gameId' | '/store'
   id:
     | '__root__'
     | '/'
     | '/_main'
-    | '/demo/store'
-    | '/demo/tanstack-query'
+    | '/_main/_auth'
+    | '/_main/store'
+    | '/_main/profile'
+    | '/_main/_auth/login'
+    | '/_main/_auth/register'
+    | '/_main/store/$gameId'
     | '/_main/store/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MainRouteRoute: typeof MainRouteRouteWithChildren
-  DemoStoreRoute: typeof DemoStoreRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -97,36 +138,96 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_main/profile': {
+      id: '/_main/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof MainProfileRouteImport
+      parentRoute: typeof MainRouteRoute
     }
-    '/demo/store': {
-      id: '/demo/store'
-      path: '/demo/store'
-      fullPath: '/demo/store'
-      preLoaderRoute: typeof DemoStoreRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_main/store': {
+      id: '/_main/store'
+      path: '/store'
+      fullPath: '/store'
+      preLoaderRoute: typeof MainStoreRouteRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
+    '/_main/_auth': {
+      id: '/_main/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof MainAuthRouteRouteImport
+      parentRoute: typeof MainRouteRoute
     }
     '/_main/store/': {
       id: '/_main/store/'
-      path: '/store'
-      fullPath: '/store'
+      path: '/'
+      fullPath: '/store/'
       preLoaderRoute: typeof MainStoreIndexRouteImport
-      parentRoute: typeof MainRouteRoute
+      parentRoute: typeof MainStoreRouteRoute
+    }
+    '/_main/store/$gameId': {
+      id: '/_main/store/$gameId'
+      path: '/$gameId'
+      fullPath: '/store/$gameId'
+      preLoaderRoute: typeof MainStoreGameIdRouteImport
+      parentRoute: typeof MainStoreRouteRoute
+    }
+    '/_main/_auth/register': {
+      id: '/_main/_auth/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof MainAuthRegisterRouteImport
+      parentRoute: typeof MainAuthRouteRoute
+    }
+    '/_main/_auth/login': {
+      id: '/_main/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof MainAuthLoginRouteImport
+      parentRoute: typeof MainAuthRouteRoute
     }
   }
 }
 
-interface MainRouteRouteChildren {
+interface MainAuthRouteRouteChildren {
+  MainAuthLoginRoute: typeof MainAuthLoginRoute
+  MainAuthRegisterRoute: typeof MainAuthRegisterRoute
+}
+
+const MainAuthRouteRouteChildren: MainAuthRouteRouteChildren = {
+  MainAuthLoginRoute: MainAuthLoginRoute,
+  MainAuthRegisterRoute: MainAuthRegisterRoute,
+}
+
+const MainAuthRouteRouteWithChildren = MainAuthRouteRoute._addFileChildren(
+  MainAuthRouteRouteChildren,
+)
+
+interface MainStoreRouteRouteChildren {
+  MainStoreGameIdRoute: typeof MainStoreGameIdRoute
   MainStoreIndexRoute: typeof MainStoreIndexRoute
 }
 
-const MainRouteRouteChildren: MainRouteRouteChildren = {
+const MainStoreRouteRouteChildren: MainStoreRouteRouteChildren = {
+  MainStoreGameIdRoute: MainStoreGameIdRoute,
   MainStoreIndexRoute: MainStoreIndexRoute,
+}
+
+const MainStoreRouteRouteWithChildren = MainStoreRouteRoute._addFileChildren(
+  MainStoreRouteRouteChildren,
+)
+
+interface MainRouteRouteChildren {
+  MainAuthRouteRoute: typeof MainAuthRouteRouteWithChildren
+  MainStoreRouteRoute: typeof MainStoreRouteRouteWithChildren
+  MainProfileRoute: typeof MainProfileRoute
+}
+
+const MainRouteRouteChildren: MainRouteRouteChildren = {
+  MainAuthRouteRoute: MainAuthRouteRouteWithChildren,
+  MainStoreRouteRoute: MainStoreRouteRouteWithChildren,
+  MainProfileRoute: MainProfileRoute,
 }
 
 const MainRouteRouteWithChildren = MainRouteRoute._addFileChildren(
@@ -136,8 +237,6 @@ const MainRouteRouteWithChildren = MainRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MainRouteRoute: MainRouteRouteWithChildren,
-  DemoStoreRoute: DemoStoreRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

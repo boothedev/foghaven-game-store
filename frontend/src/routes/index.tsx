@@ -1,16 +1,16 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   LucideChevronsDown,
   LucideChevronsUp,
   type LucideIcon,
-} from 'lucide-react';
-import { useState } from 'react';
-import FoggyScreen from '@/components/FoggyScreen';
-import { cn } from '@/lib/utils';
-import landing from '/landing.webp';
-import landingAuthors from '/landing-authors.svg';
-import landingIntro from '/landing-intro.svg';
-import landingTitle from '/landing-title.svg';
+} from "lucide-react";
+import { useState } from "react";
+import FoggyScreen from "@/components/FoggyScreen";
+import { cn } from "@/lib/utils";
+import landing from "/landing.webp";
+import landingAuthors from "/landing-authors.svg";
+import landingIntro from "/landing-intro.svg";
+import landingTitle from "/landing-title.svg";
 
 type ReactNode = React.ReactNode;
 type ReactSetState<T> = React.Dispatch<React.SetStateAction<T>>;
@@ -43,7 +43,7 @@ type RootProps = {
   setIsOnTop: ReactSetState<boolean>;
 };
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: App,
 });
 
@@ -72,8 +72,8 @@ function Content({ children }: BottomSectionProps) {
 function Switch({ Icon, isVisible, setIsOnTop }: SwitchProps) {
   return (
     <button
-      className={cn('animate-bounce drop-shadow-cyan-300/30 drop-shadow-lg', {
-        'cursor-pointer': isVisible,
+      className={cn("animate-bounce drop-shadow-cyan-300/30 drop-shadow-lg", {
+        "cursor-pointer": isVisible,
       })}
       type="button"
       onClick={() => isVisible && setIsOnTop((prev) => !prev)}
@@ -87,11 +87,11 @@ function Section({ isVisible, children }: SectionProps) {
   return (
     <div
       className={cn(
-        'pointer-events-none flex size-full justify-center opacity-0 transition-opacity',
+        "pointer-events-none flex size-full justify-center opacity-0 transition-opacity",
         {
-          'pointer-events-auto opacity-100 duration-1000 md:delay-800 md:duration-500':
+          "pointer-events-auto opacity-100 duration-1000 md:delay-800 md:duration-500":
             isVisible,
-        },
+        }
       )}
     >
       {children}
@@ -105,10 +105,10 @@ function Background({ isOnTop }: BackgroundProps) {
       src={landing}
       alt="landing background"
       className={cn(
-        'absolute h-screen w-screen object-cover object-[50%_0] transition-[object-position] duration-1000 ease-in-out',
+        "absolute h-screen w-screen object-cover object-[50%_0] transition-[object-position] duration-1000 ease-in-out",
         {
-          'object-[50%_100%]': !isOnTop,
-        },
+          "object-[50%_100%]": !isOnTop,
+        }
       )}
     />
   );
@@ -140,7 +140,7 @@ function App() {
         <Section isVisible={isOnTop}>
           <TopSection>
             <div className="lg:h-24"></div>
-            <img src={landingTitle} alt={'Foghaven'} />
+            <img src={landingTitle} alt={"Foghaven"} />
             <div className="flex flex-col items-center gap-2 font-semibold text-white text-xl uppercase tracking-wider antialiased md:text-2xl lg:text-4xl lg:tracking-wide">
               <p>Your sanctuary in the clouds</p>
               <p> Discover. Connect. Play.</p>

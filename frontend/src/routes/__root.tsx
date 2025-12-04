@@ -1,22 +1,27 @@
-import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
+import {
+  HeadContent,
+  Outlet,
+  createRootRouteWithContext,
+} from "@tanstack/react-router";
+// import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+// import { TanStackDevtools } from "@tanstack/react-devtools";
 
-import StoreDevtools from '../lib/demo-store-devtools'
+// import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-
-import type { QueryClient } from '@tanstack/react-query'
+import type { QueryClient } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/sonner";
 
 interface MyRouterContext {
-  queryClient: QueryClient
+  queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: () => (
     <>
+      <HeadContent />
       <Outlet />
-      <TanStackDevtools
+      <Toaster position="top-right" richColors />
+      {/* <TanStackDevtools
         config={{
           position: 'bottom-right',
         }}
@@ -28,7 +33,14 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           StoreDevtools,
           TanStackQueryDevtools,
         ]}
-      />
+      /> */}
     </>
   ),
-})
+  head: () => ({
+    meta: [
+      {
+        title: "Foghaven Game Store",
+      },
+    ],
+  }),
+});
