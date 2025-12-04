@@ -1,9 +1,9 @@
 import os
 import sqlite3
 
-# BASE_DIR = os.path.dirname(os.path.abspath(__))
+DB_FILE = "haven.db"
 VOLUMN_DIR = os.getenv("VOLUMN_DIR", "")
-DB_PATH = os.path.join(VOLUMN_DIR, "haven.db")
+DB_PATH = os.path.join(VOLUMN_DIR, DB_FILE)
 
 
 def get_dbconn():
