@@ -14,24 +14,31 @@ def create_order():
 
     data = request.json
     game_id = data.get("game_id")
-    price = data.get("price")
 
-    db.session.execute(
+    rs = db.session.execute(
         text("""
             UPDATE users
-            SET balance = balance - :p
-            WHERE id = :uid
+            SET balance = balance - (SELECT price from games g WHERE g.id = :game_id)
+            WHERE id = :uid AND balance >= (SELECT price from games g WHERE g.id = :game_id)
         """),
-        {"p": price, "uid": user_id},
+        {"uid": user_id, "gid": game_id},
     )
 
-    db.session.execute(
+    if not rs:
+        db.session.rollback()
+        return jsonify({"detail": "Insufficient Funds"}), 402
+
+    rs = db.session.execute(
         text("""
             INSERT INTO game_users (game_id, user_id, owned_at)
             VALUES (:gid, :uid, DATETIME('now'))
         """),
         {"gid": game_id, "uid": user_id},
     )
+
+    if not rs:
+        db.session.rollback()
+        return jsonify({"detail": "Already purchased"}), 409
 
     db.session.commit()
 
