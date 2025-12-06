@@ -1,9 +1,10 @@
-from flask import Blueprint, request, session, jsonify
-from haven import db
+from flask import Blueprint, jsonify, request, session
 from sqlalchemy import text
 
+from haven import db
 
 games_bp = Blueprint("games", __name__)
+
 
 @games_bp.get("/games")
 def get_games():
@@ -32,11 +33,11 @@ def get_game_by_id(game_id):
             FROM games
             WHERE id = :gid
         """),
-        {"gid": game_id}
+        {"gid": game_id},
     ).fetchone()
 
     if not game:
-        return jsonify({"error": "Game not found"}), 404
+        return jsonify({"detail": "Game not found"}), 404
 
     game_data = dict(game._mapping)
 
@@ -48,7 +49,7 @@ def get_game_by_id(game_id):
             WHERE gp.game_id = :gid
             ORDER BY p.weight DESC
         """),
-        {"gid": game_id}
+        {"gid": game_id},
     ).fetchall()
 
     game_data["platforms"] = [dict(p._mapping) for p in platforms]
@@ -61,12 +62,13 @@ def get_game_by_id(game_id):
             WHERE gg.game_id = :gid
             ORDER BY g.weight DESC
         """),
-        {"gid": game_id}
+        {"gid": game_id},
     ).fetchall()
 
     game_data["genres"] = [dict(g._mapping) for g in genres]
 
     return jsonify(game_data)
+
 
 @games_bp.put("/games/<int:game_id>/ratings")
 def update_rating(game_id):
@@ -74,22 +76,22 @@ def update_rating(game_id):
 
     user_id = session.get("user_id")
     if not user_id:
-        return jsonify({"error": "Not logged in"}), 401
+        return jsonify({"detail": "Not logged in"}), 401
 
     stars = data.get("stars")
     if stars is None or stars < 1 or stars > 5:
-        return jsonify({"error": "Stars must be between 1 and 5"}), 400
+        return jsonify({"detail": "Stars must be between 1 and 5"}), 400
     owned = db.session.execute(
         text("""
             SELECT stars
             FROM game_users
             WHERE game_id = :gid AND user_id = :uid
         """),
-        {"gid": game_id, "uid": user_id}
+        {"gid": game_id, "uid": user_id},
     ).fetchone()
 
     if not owned:
-        return jsonify({"error": "User does not own this game"}), 400
+        return jsonify({"detail": "User does not own this game"}), 400
 
     db.session.execute(
         text("""
@@ -97,7 +99,7 @@ def update_rating(game_id):
             SET stars = :stars
             WHERE game_id = :gid AND user_id = :uid
         """),
-        {"stars": stars, "gid": game_id, "uid": user_id}
+        {"stars": stars, "gid": game_id, "uid": user_id},
     )
 
     agg = db.session.execute(
@@ -106,7 +108,7 @@ def update_rating(game_id):
             FROM game_users
             WHERE game_id = :gid AND stars IS NOT NULL
         """),
-        {"gid": game_id}
+        {"gid": game_id},
     ).fetchone()
 
     new_count = agg.count or 0
@@ -118,13 +120,9 @@ def update_rating(game_id):
             SET rating = :avg, rater_count = :count
             WHERE id = :gid
         """),
-        {"avg": new_avg, "count": new_count, "gid": game_id}
+        {"avg": new_avg, "count": new_count, "gid": game_id},
     )
 
     db.session.commit()
 
-    return jsonify({
-        "game_id": game_id,
-        "user_id": user_id,
-        "stars": stars
-    })
+    return jsonify({"game_id": game_id, "user_id": user_id, "stars": stars})
