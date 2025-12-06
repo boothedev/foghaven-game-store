@@ -27,6 +27,7 @@ def update_current_user(body: UserUpdate, session_id: Optional[str] = Cookie(Non
         (current_password_hash,) = conn.execute(
             """
             SELECT password
+            FROM users
             WHERE id = :user_id
             """,
             params,
