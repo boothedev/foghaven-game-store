@@ -14,7 +14,7 @@ def register():
     password = data.get("password")
 
     existing = db.session.execute(
-        text("SELECT id FROM users WHERE username = :u"), {"u": username}
+        text("SELECT 1 FROM users WHERE username = :u"), {"u": username}
     ).fetchone()
 
     if existing:
@@ -35,6 +35,9 @@ def register():
         text("SELECT id, username, balance FROM users WHERE username = :u"),
         {"u": username},
     ).fetchone()
+
+    if not user:
+        return jsonify(None), 404
 
     session["user_id"] = user.id
 
@@ -85,6 +88,9 @@ def current_user():
         """),
         {"uid": user_id},
     ).fetchall()
+
+    if not user:
+        return jsonify(None), 401
 
     return jsonify(
         {
