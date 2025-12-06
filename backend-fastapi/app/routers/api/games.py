@@ -2,13 +2,12 @@ from typing import Annotated, Optional
 
 from fastapi import APIRouter, Cookie, HTTPException, Query
 
+from app.db import get_dbconn
+from app.schemas import FilterParams, GameRate
 from app.utils.authenticate import extract_access_token
+from app.utils.sqlresult import sqlresult_to_dict, sqlresult_to_dictlist
 
-from ..db import get_dbconn
-from ..schemas import FilterParams, GameRate
-from ..utils.sqlresult import sqlresult_to_dict, sqlresult_to_dictlist
-
-router = APIRouter(prefix="/api/games")
+router = APIRouter(prefix="/games")
 
 
 def _search_games(conn, search: str):

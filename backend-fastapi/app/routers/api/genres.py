@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 
-from ..db import get_dbconn
-from ..utils.sqlresult import sqlresult_to_dictlist
+from app.db import get_dbconn
+from app.utils.sqlresult import sqlresult_to_dictlist
 
-router = APIRouter(prefix="/api/genres")
+router = APIRouter(prefix="/genres")
 
 
 @router.get("")
