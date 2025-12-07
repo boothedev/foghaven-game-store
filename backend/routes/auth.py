@@ -1,8 +1,19 @@
 from flask import Blueprint, jsonify, request, session
+from pwdlib import PasswordHash
 from sqlalchemy import text
-from werkzeug.security import check_password_hash, generate_password_hash
 
 from haven import db
+
+password_hash = PasswordHash.recommended()
+
+
+def verify_password(plain_password, hashed_password):
+    return password_hash.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password):
+    return password_hash.hash(password)
+
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -20,7 +31,7 @@ def register():
     if existing:
         return jsonify({"detail": "Username already exists"}), 400
 
-    hashed_password = generate_password_hash(password)
+    hashed_password = get_password_hash(password)
 
     db.session.execute(
         text("""
@@ -61,45 +72,12 @@ def login():
         {"u": username},
     ).fetchone()
 
-    if not user or not check_password_hash(user.hashed, password):
+    if not user or not verify_password(password, user.hashed):
         return jsonify({"detail": "Invalid username or password"}), 401
 
     session["user_id"] = user.id
 
     return jsonify(None)
-
-
-@auth_bp.get("/currentuser")
-def current_user():
-    user_id = session.get("user_id")
-
-    if not user_id:
-        return jsonify(None), 401
-
-    user = db.session.execute(
-        text("SELECT id, username, balance FROM users WHERE id = :id"), {"id": user_id}
-    ).fetchone()
-
-    cards = db.session.execute(
-        text("""
-            SELECT id, number, exp_month, exp_year
-            FROM payment_cards
-            WHERE user_id = :uid
-        """),
-        {"uid": user_id},
-    ).fetchall()
-
-    if not user:
-        return jsonify(None), 401
-
-    return jsonify(
-        {
-            "id": user.id,
-            "username": user.username,
-            "balance": user.balance,
-            "cards": [dict(c._mapping) for c in cards],
-        }
-    )
 
 
 @auth_bp.post("/logout")
