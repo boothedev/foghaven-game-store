@@ -121,7 +121,7 @@ def get_games():
             {condition_string}
             ORDER BY {sort_by} {order_by}
             LIMIT :size
-            OFFSET :offset)
+            OFFSET :offset
     """)
 
     rows = db.session.execute(sql, params).fetchall()
@@ -134,7 +134,7 @@ def get_game_by_id(game_id):
     user_id = session.get("user_id")
     game = db.session.execute(
         text("""
-            SELECT id, name, price, introduction, landscape, release_date, rating
+            SELECT id, name, price, introduction, description, developer, publisher, portrait, landscape, background, release_date, rater_count, rating
             FROM games
             WHERE id = :gid
         """),
@@ -148,7 +148,7 @@ def get_game_by_id(game_id):
 
     platforms = db.session.execute(
         text("""
-            SELECT p.id, p.name, p.value, p.weight
+            SELECT p.id, p.name, p.value, gp.min_requirements, gp.rec_requirements
             FROM platforms p
             JOIN game_platforms gp ON gp.platform_id = p.id
             WHERE gp.game_id = :gid
@@ -158,10 +158,11 @@ def get_game_by_id(game_id):
     ).fetchall()
 
     game_data["platforms"] = [dict(p._mapping) for p in platforms]
+    game_data["platforms"]
 
     genres = db.session.execute(
         text("""
-            SELECT g.id, g.name, g.icon, g.weight
+            SELECT g.id, g.name, g.icon
             FROM genres g
             JOIN game_genres gg ON gg.genre_id = g.id
             WHERE gg.game_id = :gid
