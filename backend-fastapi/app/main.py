@@ -5,13 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 
-from .routers import auth as auth_router
-from .routers import games as games_router
-from .routers import genres as genres_router
-from .routers import orders as orders_router
-from .routers import payment_cards as payment_cards_router
-from .routers import platforms as platforms_router
-from .routers import users as users_router
+from . import routers
 
 app = FastAPI()
 
@@ -27,17 +21,11 @@ app.add_middleware(
 
 
 # Mount static files (keep same path as before)
-app.mount("/api/static", StaticFiles(directory="dist"), name="static")
+app.mount("/static", StaticFiles(directory="dist"), name="static")
 
 
 # Include routers
-app.include_router(games_router.router)
-app.include_router(genres_router.router)
-app.include_router(platforms_router.router)
-app.include_router(auth_router.router)
-app.include_router(users_router.router)
-app.include_router(payment_cards_router.router)
-app.include_router(orders_router.router)
+app.include_router(routers.api_router)
 
 
 # Serve main application files

@@ -2,14 +2,13 @@ from typing import Any, Optional
 
 from fastapi import APIRouter, Cookie, HTTPException, Response, status
 
+from app.db import get_dbconn
+from app.schemas import UserUpdate
 from app.utils.authenticate import COOKIE_SESSION, extract_access_token
 from app.utils.hashing import get_password_hash, verify_password
+from app.utils.sqlresult import sqlresult_to_dict, sqlresult_to_dictlist
 
-from ..db import get_dbconn
-from ..schemas import UserUpdate
-from ..utils.sqlresult import sqlresult_to_dict, sqlresult_to_dictlist
-
-router = APIRouter(prefix="/api")
+router = APIRouter()
 
 
 @router.patch("/currentuser")
@@ -27,7 +26,6 @@ def update_current_user(body: UserUpdate, session_id: Optional[str] = Cookie(Non
         (current_password_hash,) = conn.execute(
             """
             SELECT password
-            FROM users
             WHERE id = :user_id
             """,
             params,

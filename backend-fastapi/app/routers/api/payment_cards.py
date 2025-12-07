@@ -2,12 +2,11 @@ from typing import Optional
 
 from fastapi import APIRouter, Cookie, HTTPException, status
 
+from app.db import get_dbconn
+from app.schemas import PaymentCard
 from app.utils.authenticate import extract_access_token
 
-from ..db import get_dbconn
-from ..schemas import PaymentCard
-
-router = APIRouter(prefix="/api/payment_cards")
+router = APIRouter(prefix="/payment_cards")
 
 
 @router.post("")

@@ -2,6 +2,8 @@ from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Response, status
 
+from app.db import get_dbconn
+from app.schemas import UserAuth
 from app.utils.authenticate import (
     ACCESS_TOKEN_EXPIRE_SECOND,
     ACCESS_TOKEN_EXPIRE_SECOND_TMP,
@@ -10,10 +12,7 @@ from app.utils.authenticate import (
 )
 from app.utils.hashing import get_password_hash, verify_password
 
-from ..db import get_dbconn
-from ..schemas import UserAuth
-
-router = APIRouter(prefix="/api")
+router = APIRouter()
 
 
 @router.post("/login")

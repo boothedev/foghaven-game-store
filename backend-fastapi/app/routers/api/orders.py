@@ -2,12 +2,11 @@ from typing import Optional
 
 from fastapi import APIRouter, Cookie, HTTPException, status
 
+from app.db import get_dbconn
+from app.schemas import GamesPurchase
 from app.utils.authenticate import extract_access_token
 
-from ..db import get_dbconn
-from ..schemas import GamesPurchase
-
-router = APIRouter(prefix="/api/orders")
+router = APIRouter(prefix="/orders")
 
 
 @router.post("")
