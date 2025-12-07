@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
-from haven import db
 from sqlalchemy import text
+
+from haven import db
 
 platforms_bp = Blueprint("platforms", __name__)
 

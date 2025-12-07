@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
-from haven import db
 from sqlalchemy import text
+
+from haven import db
 
 genres_bp = Blueprint("genres", __name__)
 

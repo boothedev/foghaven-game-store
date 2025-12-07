@@ -1,6 +1,7 @@
-from flask import Blueprint, request, session, jsonify
-from haven import db
+from flask import Blueprint, jsonify, request, session
 from sqlalchemy import text
+
+from haven import db
 
 cards_bp = Blueprint("cards", __name__)
 
@@ -8,17 +9,17 @@ cards_bp = Blueprint("cards", __name__)
 @cards_bp.get("/payment_cards")
 def get_cards():
     user_id = session.get("user_id")
-    
+
     if not user_id:
-        return jsonify({"error": "Not logged in"}), 401
-    
+        return jsonify({"detail": "Not logged in"}), 401
+
     rows = db.session.execute(
         text("""
-            SELECT id, number, exp_month, exp_year
+            SELECT id, name, number, exp_month, exp_year
             FROM payment_cards
             WHERE user_id = :uid
         """),
-        {"uid": user_id}
+        {"uid": user_id},
     ).fetchall()
 
     return jsonify([dict(r._mapping) for r in rows])
@@ -26,7 +27,6 @@ def get_cards():
 
 @cards_bp.post("/payment_cards")
 def add_card():
-
     user_id = session.get("user_id")
     data = request.json
 
@@ -47,25 +47,26 @@ def add_card():
             "number": number,
             "month": exp_month,
             "year": exp_year,
-            "sec": security
-        }
+            "sec": security,
+        },
     )
     db.session.commit()
 
     return jsonify({"message": "Card added"})
 
+
 @cards_bp.delete("/payment_cards/<int:card_id>")
 def delete_card(card_id):
     user_id = session.get("user_id")
     if not user_id:
-        return jsonify({"error": "Not logged in"}), 401
+        return jsonify({"detail": "Not logged in"}), 401
 
     db.session.execute(
         text("""
             DELETE FROM payment_cards
             WHERE id = :cid AND user_id = :uid
         """),
-        {"cid": card_id, "uid": user_id}
+        {"cid": card_id, "uid": user_id},
     )
     db.session.commit()
 
