@@ -15,7 +15,7 @@ def get_cards():
 
     rows = db.session.execute(
         text("""
-            SELECT id, number, exp_month, exp_year
+            SELECT id, name, number, exp_month, exp_year
             FROM payment_cards
             WHERE user_id = :uid
         """),
