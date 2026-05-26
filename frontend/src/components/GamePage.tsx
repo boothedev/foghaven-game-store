@@ -64,7 +64,7 @@ type GamePageProps = {
 
 function OverviewTab({ game }: OverviewTabProps) {
   return (
-    <div className="flex flex-col justify-between h-full">
+    <div className="flex flex-col xl:justify-between xl:h-full gap-3">
       <section
         className="text-md"
         dangerouslySetInnerHTML={{ __html: game.introduction }}
@@ -126,7 +126,7 @@ function RequirementsTab({
   rec_requirements,
 }: RequirementsTabProps) {
   return (
-    <div className="flex gap-6 justify-between items-stretch text-sm leading-relaxed">
+    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-between items-stretch text-sm leading-relaxed">
       {min_requirements && (
         <section className="flex-1">
           <div
@@ -169,7 +169,7 @@ function ScreenshotsTab({ screenshots }: ScreenshotTabProps) {
     <div>
       <Carousel
         setApi={setApi}
-        className="mx-auto w-lg flex justify-center items-center -my-1"
+        className="mx-auto w-full max-w-lg flex justify-center items-center -my-1"
       >
         <CarouselContent className="w-full">
           {screenshots.map(({ id, thumbnail, content: _ }) => {
@@ -212,7 +212,7 @@ function MoviesTab({ movies }: MoviesTabProps) {
     <div>
       <Carousel
         setApi={setApi}
-        className="mx-auto w-lg flex justify-center items-center -my-1"
+        className="mx-auto w-full max-w-lg flex justify-center items-center -my-1"
       >
         <CarouselContent className="w-full">
           {movies.map(({ id, thumbnail, content_sd }, index) => {
@@ -250,7 +250,7 @@ function MoviesTab({ movies }: MoviesTabProps) {
 
 function AchievementsTab({ achievements }: AchievementsTabProps) {
   return (
-    <div className="grid grid-cols-2 col-gap gap-x-4 gap-y-2 mx-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 mx-0 sm:mx-2">
       {achievements.map(({ id, name, thumbnail }) => (
         <div
           key={id}
@@ -304,8 +304,8 @@ function HeaderTabManager({ game }: HeaderTabsProps) {
   ];
 
   return (
-    <Tabs defaultValue="overview" className="gap-4 h-full">
-      <TabsList className="bg-background rounded-none border-b p-0 gap-5">
+    <Tabs defaultValue="overview" className="gap-4 max-xl:block max-xl:space-y-4 xl:h-full">
+      <TabsList className="bg-background rounded-none border-b p-0 gap-3 sm:gap-5 overflow-x-auto max-w-full h-auto min-h-9 flex-wrap">
         {tabs
           .filter((tab) => !tab.disabled)
           .map((tab) => (
@@ -321,7 +321,7 @@ function HeaderTabManager({ game }: HeaderTabsProps) {
       </TabsList>
 
       {tabs.map((tab) => (
-        <TabsContent key={tab.value} value={tab.value}>
+        <TabsContent key={tab.value} value={tab.value} className="max-xl:block">
           {tab.content}
         </TabsContent>
       ))}
@@ -554,9 +554,9 @@ export function GamePage({ game }: GamePageProps) {
           onError={(e) => e.currentTarget.remove()}
         />
       </div>
-      <div className="w-3xl mx-auto xl:w-5xl">
-        <header className="flex drop-shadow-sm drop-shadow-card/50 rounded-xl overflow-hidden my-10 size-full aspect-7/3 backdrop-blur-lg bg-card">
-          <div className="relative aspect-2/3 group">
+      <div className="w-full max-w-3xl mx-auto xl:max-w-5xl px-4">
+        <header className="flex flex-col xl:flex-row drop-shadow-sm drop-shadow-card/50 rounded-xl xl:overflow-hidden my-6 md:my-10 w-full xl:aspect-7/3 backdrop-blur-lg bg-card">
+          <div className="relative aspect-video xl:aspect-2/3 group w-full xl:w-auto shrink-0">
             <img src={portrait} alt={name} className="object-cover size-full" />
             <div className="group transition-all hover:bg-foreground/80 absolute inset-0 text-white text-lg w-full">
               <div className="absolute bottom-0 py-2 bg-foreground/70 w-full group-hover:bg-transparent">
@@ -580,19 +580,19 @@ export function GamePage({ game }: GamePageProps) {
               </div>
             </div>
           </div>
-          <div className="p-8 text-lg flex flex-col h-full aspect-5/3 gap-1.5">
-            <section className="flex gap-2 items-center justify-between">
+          <div className="p-4 md:p-8 text-base md:text-lg flex flex-col xl:h-full xl:aspect-5/3 gap-1.5 w-full min-w-0">
+            <section className="shrink-0 flex flex-col sm:flex-row gap-2 items-start sm:items-center sm:justify-between w-full">
               <div className="flex gap-2 items-center w-full">
-                <h1 className="text-3xl font-black">{name}</h1>
+                <h1 className="text-2xl md:text-3xl font-black">{name}</h1>
               </div>
               {owned ? (
                 <ButtonLaunchGame
                   gameId={id}
-                  className="font-semibold text-lg cursor-pointer min-w-35 shrink-0"
+                  className="font-semibold text-lg cursor-pointer min-w-35 shrink-0 w-full sm:w-auto"
                 />
               ) : (
                 <ButtonPurchase
-                  className="font-semibold text-lg cursor-pointer min-w-35 shrink-0"
+                  className="font-semibold text-lg cursor-pointer min-w-35 shrink-0 w-full sm:w-auto"
                   id={id}
                   name={name}
                   price={price}
@@ -603,8 +603,8 @@ export function GamePage({ game }: GamePageProps) {
             <HeaderTabManager game={game} />
           </div>
         </header>
-        <div className="mx-auto flex flex-col items-center justify-center border rounded-xl px-10 py-15 my-10 shadow-sm bg-card/80 backdrop-blur-lg">
-          <h2 className="font-medium font-title text-7xl text-foreground/90 text-shadow-blue-300/70 text-shadow-md tracking-wide mb-10">
+        <div className="mx-auto flex flex-col items-center justify-center border rounded-xl px-4 sm:px-6 md:px-10 py-6 md:py-15 my-6 md:my-10 shadow-sm bg-card/80 backdrop-blur-lg">
+          <h2 className="font-medium font-title text-4xl sm:text-5xl md:text-7xl text-foreground/90 text-shadow-blue-300/70 text-shadow-md tracking-wide mb-6 md:mb-10">
             ABOUT THE GAME
           </h2>
           <div
